@@ -1,23 +1,32 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
-#include "../include/lame.h"
-#include "sndfile.hh"
+
+#include <lame.h>
+#include <sndfile.hh>
+#include <sndfile.h>
 
 constexpr int BUFFER_SIZE = 8192; // 8kb buffer
 constexpr int MP3_BUFFER_SIZE = 8192; // 8kb buffer
 constexpr int PCM_BUFFER_SIZE = 16384; // 16kb buffer
 
-void PrintFileInfo(std::string filename) {
+void PrintFileInfo(std::string inputFile) {
     // Print file properties with libsndfile
-    // See example on github (https://github.com/libsndfile/libsndfile/blob/master/examples/sndfilehandle.cc)
-    SndfileHandle pcm_file = SndfileHandle(filename);
+    SndfileHandle inputFileHandle = SndfileHandle(inputFile);
+    if (inputFileHandle.error()) {
+        std::cout << "Could not open input file: " << inputFileHandle.strError() << std::endl;
+        return;
+    } else {
+        std::cout << "Opened input file: " << inputFile << std::endl;
+        std::cout << "Format: 0x" << std::hex << inputFileHandle.format() << std::endl;
+        std::cout << "Sample rate: " << std::dec << inputFileHandle.samplerate() << std::endl;
+        std::cout << "Channels: " << inputFileHandle.channels() << std::endl;
+        std::cout << "Frames in file: " << inputFileHandle.frames() << std::endl;
+        std::cout << "Check against format: " << inputFileHandle.formatCheck(inputFileHandle.format(), inputFileHandle.channels(), inputFileHandle.samplerate()) << std::endl;
+        std::cout << "" << std::endl;
+    }
 
-    std::cout << "Opened file " << filename << std::endl;
-    std::cout << "Format: 0x" << std::hex << pcm_file.format() << std::endl;
-    std::cout << "Sample rate: " << std::dec << pcm_file.samplerate() << std::endl;
-    std::cout << "Channels: " << pcm_file.channels() << std::endl;
-    std::cout << "Frames in file: " << pcm_file.frames() << std::endl;
+    return;
 }
 
 lame_global_flags* InitLameWithFlags() {
@@ -83,6 +92,64 @@ void ConvertWavToMp3(const std::string inputFile, const std::string outputFile) 
     lame_close(gfp);
 }
 
+void ConvertAudioFile(std::string inputFile, std::string outputFile, int outputFormat) {
+    SndfileHandle inputFileHandle = SndfileHandle(inputFile);
+    if (inputFileHandle.error()) {
+        std::cout << "Could not open input file: " << inputFileHandle.strError() << std::endl;
+        return;
+    } else {
+        std::cout << "Opened input file: " << inputFile << std::endl;
+        std::cout << "Format: 0x" << std::hex << inputFileHandle.format() << std::endl;
+        std::cout << "Sample rate: " << std::dec << inputFileHandle.samplerate() << std::endl;
+        std::cout << "Channels: " << inputFileHandle.channels() << std::endl;
+        std::cout << "Frames in file: " << inputFileHandle.frames() << std::endl;
+        std::cout << "" << std::endl;
+    }
+
+    SndfileHandle outputFileHandle = SndfileHandle(
+        outputFile,
+        SFM_WRITE,
+        outputFormat,
+        inputFileHandle.channels(),
+        inputFileHandle.samplerate()
+    );
+    if (outputFileHandle.error()) {
+        std::cout << "Could not open output file: " << outputFileHandle.strError() << std::endl;
+        std::cout << "Check against specified format (1 = pass): " << outputFileHandle.formatCheck(outputFormat, inputFileHandle.channels(), inputFileHandle.samplerate()) << std::endl;
+        return;
+    } else {
+        std::cout << "Opened output file: " << outputFile << std::endl;
+        std::cout << "Format: 0x" << std::hex << outputFileHandle.format() << std::endl;
+        std::cout << "Sample rate: " << std::dec << outputFileHandle.samplerate() << std::endl;
+        std::cout << "Channels: " << outputFileHandle.channels() << std::endl;
+        std::cout << "" << std::endl;
+    }
+
+    static short buffer[BUFFER_SIZE];
+
+    sf_count_t read = 1;
+    sf_count_t write = 1;
+
+    while (read != 0) {
+        read = inputFileHandle.read(buffer, BUFFER_SIZE);
+        // std::cout << "Read: " << read << std::endl;
+        
+        if (read != 0) {
+            write = outputFileHandle.write(buffer, read);
+            // std::cout << "Write: " << write << std::endl;
+        }
+    }
+
+    std::cout << "\nFinished file conversion.\nReached end of input file. Last read: " << read << std::endl;
+    if (write == 0) {
+        std::cout << "Warning: Last write was 0 bytes! Last write: " << write << "\n" << std::endl;
+    } else {
+        std::cout << "Last write: " << write << "\n\n" << std::endl;
+    }
+
+    return; 
+}
+
 int main() {
 
     /* Attempt 1: read the API docs
@@ -119,6 +186,21 @@ int main() {
     PrintFileInfo(inputFile);
     
     ConvertWavToMp3(inputFile, outputFile);
+    std::cout << "\n----------------\n" << std::endl;
+
+    // Attempt to read from an mp3 file (non-working)
+    PrintFileInfo("test-audio/mp3/1-01 Wishful Thinking.mp3");
+    std::cout << "\n----------------\n" << std::endl;
+
+    /*  
+    FLAC example: SF_FORMAT_FLAC | SF_FORMAT_PCM_16
+    MP3 example (non-working): SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III
+    */
+    ConvertAudioFile(
+        "test-audio/wav/perc/BGE_170_Rising_Tops_2.wav",
+        "test-audio/out/BGE_170_Rising_Tops_2.flac",
+        SF_FORMAT_FLAC | SF_FORMAT_PCM_16
+    );
 
     return 0;
 }

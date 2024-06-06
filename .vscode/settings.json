@@ -45,7 +45,26 @@
         "streambuf": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "charconv": "cpp",
+        "condition_variable": "cpp",
+        "forward_list": "cpp",
+        "optional": "cpp",
+        "mutex": "cpp",
+        "__locale": "cpp",
+        "ios": "cpp",
+        "locale": "cpp",
+        "variant": "cpp",
+        "bitset": "cpp",
+        "chrono": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "ratio": "cpp",
+        "thread": "cpp",
+        "__bit_reference": "cpp",
+        "__threading_support": "cpp",
+        "__verbose_abort": "cpp",
+        "print": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }
