@@ -44,7 +44,8 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "stdio.h": "c"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }
