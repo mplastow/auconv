@@ -64,7 +64,14 @@
         "__bit_reference": "cpp",
         "__threading_support": "cpp",
         "__verbose_abort": "cpp",
-        "print": "cpp"
+        "print": "cpp",
+        "strstream": "cpp",
+        "codecvt": "cpp",
+        "fstream": "cpp",
+        "iomanip": "cpp",
+        "semaphore": "cpp",
+        "sstream": "cpp",
+        "stop_token": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }
