@@ -231,7 +231,13 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // Single file
     if (mode_flag == "-s") {
+        if (!starting_path.has_filename()) {
+            std::cout << "Path must be a file, not a directory." << std::endl;
+            return 1;
+        }
+
         if (starting_path.extension() == ".wav") {
             std::cout << "Converting wav file: " << starting_path.filename() << std::endl;
 
@@ -244,14 +250,32 @@ int main(int argc, char** argv) {
                 SF_FORMAT_FLAC | SF_FORMAT_PCM_16
             );
         }
-    } else if (mode_flag == "-d") {
+    }
+    // Directory, all items
+    else if (mode_flag == "-d") {
+        // Check if path is to a file
+        if (starting_path.has_filename()) {
+            std::cout << "Path must be a directory, not a file, when using '-d'" << std::endl;
+            return 1;
+        }
+
         ConvertWavToFlacInDir(starting_path);
-    } else if (mode_flag == "-t") {
+    }
+    // Directory tree, all items
+    else if (mode_flag == "-t") {
+        // Check if path is to a file
+        if (starting_path.has_filename()) {
+            std::cout << "Path must be a directory, not a file, when using '-t'" << std::endl;
+            return 1;
+        }
+
         ConvertWavToFlacInDirTree(starting_path);
     } else {
         std::cout << "Unspecified conversion mode. Use auconv --help" << std::endl;
         return 1;
     }
+
+    std::cout << "Converted all audio files." << std::endl;
 
     return 0;
 }
