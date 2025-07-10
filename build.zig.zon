@@ -65,6 +65,10 @@
         //    // actually used.
         //    .lazy = false,
         //},
+        .compile_commands = .{
+            .url = "https://github.com/the-argus/zig-compile-commands/archive/1a71188d1816cc0741785d4694f790a1106a150a.tar.gz",
+            .hash = "N-V-__8AABjOAAD9JOGy29zdkAQcgyQyd0NaOn0zP0KyC40W",
+        },
     },
 
     // Specifies the set of files and directories that are included in this package.

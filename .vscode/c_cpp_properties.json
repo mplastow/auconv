@@ -3,7 +3,10 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}lib/include/",
+                "${workspaceFolder}external/"
             ],
             "defines": [],
             "cStandard": "c23",

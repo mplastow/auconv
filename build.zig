@@ -1,5 +1,8 @@
 const std = @import("std");
 
+// Generates a `compile_commands.json` in the root dir for use by clangd
+const ccjson = @import("compile_commands");
+
 pub fn build(b: *std.Build) void {
 
     ////////////////////////////////////////////////////////////////////////////
@@ -9,6 +12,9 @@ pub fn build(b: *std.Build) void {
     const optimize = b.standardOptimizeOption(.{
         .preferred_optimize_mode = .Debug,
     });
+
+    // Make a list of targets that have include files and C source files
+    var targets = std.ArrayList(*std.Build.Step.Compile).init(b.allocator);
 
     ////////////////////////////////////////////////////////////////////////////
     // Build and install a C++ library
@@ -43,6 +49,8 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+
+    targets.append(exe) catch @panic("OOM");
 
     // Array of .c and .cpp filenames to pass to addCSourceFiles()
     // #includes from any files listed here do not need to be added to this array
@@ -118,6 +126,10 @@ pub fn build(b: *std.Build) void {
         // // Enable Tracy profiler
         // "-DTRACY_ENABLE",
     };
+
+    // Add a step called "ccjson" (Compile commands DataBase) for making compile_commands.json.
+    // To run this step, do `zig build ccjson`
+    ccjson.createStep(b, "ccjson", targets.toOwnedSlice() catch @panic("OOM"));
 
     // Add include paths (one path per folder containing a #include)
     exe.addIncludePath(b.path("include/"));
