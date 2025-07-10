@@ -11,7 +11,10 @@
 
 namespace auconv {
 
-void convertAudioFile(std::filesystem::path const& inputFile, std::filesystem::path const& outputFile, int outputFormat);
+void convertAudioFile(
+    std::filesystem::path const& inputFile,
+    std::filesystem::path const& outputFile,
+    int outputFormat);
 
 } // namespace auconv
 

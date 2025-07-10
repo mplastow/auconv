@@ -7,7 +7,10 @@
 
 namespace auconv {
 
-void convertAudioFile(std::filesystem::path const& inputFile, std::filesystem::path const& outputFile, int outputFormat)
+void convertAudioFile(
+    std::filesystem::path const& inputFile,
+    std::filesystem::path const& outputFile,
+    int outputFormat)
 {
     // Get handle to input file
     SndfileHandle inputFileHandle = SndfileHandle(inputFile);
