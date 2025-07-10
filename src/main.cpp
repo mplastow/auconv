@@ -1,6 +1,7 @@
+// main.cpp - auconv
+
 #include <iostream>
-#include <fstream>
-#include <stdio.h>
+#include <cstdio>
 #include <string>
 #include <filesystem>
 
@@ -12,19 +13,25 @@ constexpr int BUFFER_SIZE = 1024; // 1kb buffer
 constexpr int MP3_BUFFER_SIZE = BUFFER_SIZE;
 constexpr int PCM_BUFFER_SIZE = BUFFER_SIZE * 2;
 
-void PrintFileInfo(std::string inputFile)
+constexpr int HZ_44100 = 44100;
+constexpr int BITRATE_320 = 320;
+constexpr int COMP_RATIO_DEFAULT = 11;
+
+namespace {
+
+void PrintFileInfo(std::string const& inputFile)
 {
     // Print file properties with libsndfile
     SndfileHandle inputFileHandle = SndfileHandle(inputFile);
-    if (inputFileHandle.error()) {
-        std::cout << "\tCould not open input file: " << inputFileHandle.strError() << std::endl;
+    if (inputFileHandle.error() != 0) {
+        std::cout << "\tCould not open input file: " << inputFileHandle.strError() << '\n';
         return;
     } else {
-        std::cout << "\tInput file: " << inputFile << std::endl;
-        std::cout << "\t\tFormat: 0x" << std::hex << inputFileHandle.format() << std::endl;
-        std::cout << "\t\tSample rate: " << std::dec << inputFileHandle.samplerate() << std::endl;
-        std::cout << "\t\tChannels: " << inputFileHandle.channels() << std::endl;
-        std::cout << "\t\tFrames in file: " << inputFileHandle.frames() << std::endl;
+        std::cout << "\tInput file: " << inputFile << '\n';
+        std::cout << "\t\tFormat: 0x" << std::hex << inputFileHandle.format() << '\n';
+        std::cout << "\t\tSample rate: " << std::dec << inputFileHandle.samplerate() << '\n';
+        std::cout << "\t\tChannels: " << inputFileHandle.channels() << '\n';
+        std::cout << "\t\tFrames in file: " << inputFileHandle.frames() << '\n';
     }
 }
 
@@ -37,23 +44,23 @@ lame_global_flags* InitLameWithFlags()
     // Set global flags
     // Input stream flags
     lame_set_num_samples(gfp, BUFFER_SIZE); /* number of samples in the input stream */
-    lame_set_in_samplerate(gfp, 44100);     /* sample rate is 44.1k or 48k */
+    lame_set_in_samplerate(gfp, HZ_44100);  /* sample rate is 44.1k or 48k */
     lame_set_num_channels(gfp, 2);          /* 1 for mono, 2 for joint/stereo */
     // Output stream flags TODO: find optimal settings
-    lame_set_out_samplerate(gfp, 44100); /* sample rate is 44.1k or 48k */
-    lame_set_mode(gfp, JOINT_STEREO);    /* mono, stereo, joint stereo */
-    lame_set_quality(gfp, 0);            /* 0 = best 2 = high 5 = med 7 = low */
-    lame_set_brate(gfp, 320);            /* max bitrate = 320 kbps */
-    lame_set_compression_ratio(gfp, 11); /* default compression ratio = 11 */
+    lame_set_out_samplerate(gfp, HZ_44100);              /* sample rate is 44.1k or 48k */
+    lame_set_mode(gfp, JOINT_STEREO);                    /* mono, stereo, joint stereo */
+    lame_set_quality(gfp, 0);                            /* 0 = best 2 = high 5 = med 7 = low */
+    lame_set_brate(gfp, BITRATE_320);                    /* max bitrate = 320 kbps */
+    lame_set_compression_ratio(gfp, COMP_RATIO_DEFAULT); /* default compression ratio = 11 */
 
     // int ret_code = lame_init_params(gfp);
     // Check for problems: ret_code must be >= 0
-    std::cout << "LAME init (>= 0 is success): " << lame_init_params(gfp) << std::endl;
+    std::cout << "LAME init (>= 0 is success): " << lame_init_params(gfp) << '\n';
 
     return gfp;
 }
 
-void ConvertWavToMp3(const std::string inputFile, const std::string outputFile)
+void ConvertWavToMp3(std::string const& inputFile, std::string const& outputFile)
 {
     // mp3 conversion with libmp3lame
     // See https://stackoverflow.com/a/2496831/22896065
@@ -63,11 +70,11 @@ void ConvertWavToMp3(const std::string inputFile, const std::string outputFile)
     static short int pcm_buffer[PCM_BUFFER_SIZE]; // double buffer size due to interlaced channels
     // Read from file into buffer
     int read = 0;
-    std::cout << "PCM buffer length: " << sizeof(pcm_buffer) << " bytes." << std::endl;
+    std::cout << "PCM buffer length: " << sizeof(pcm_buffer) << " bytes." << '\n';
 
     // Create mp3 buffer: char type used for size
     static unsigned char mp3_buffer[MP3_BUFFER_SIZE];
-    std::cout << "MP3 buffer length: " << sizeof(mp3_buffer) << " bytes." << std::endl;
+    std::cout << "MP3 buffer length: " << sizeof(mp3_buffer) << " bytes." << '\n';
 
     FILE* pcm_file_ptr = fopen("test-audio/wav/BGE_170_G_Stars_Arp_Pad_16.wav", "rb");
     FILE* mp3_file_ptr = fopen("test-audio/out/out1.mp3", "wb");
@@ -93,12 +100,12 @@ void ConvertWavToMp3(const std::string inputFile, const std::string outputFile)
     lame_close(gfp);
 }
 
-void ConvertAudioFile(std::string inputFile, std::string outputFile, int outputFormat)
+void ConvertAudioFile(std::string const& inputFile, std::string const& outputFile, int outputFormat)
 {
     // Get handle to input file
     SndfileHandle inputFileHandle = SndfileHandle(inputFile);
     if (inputFileHandle.error()) {
-        std::cout << "Could not open input file: " << inputFileHandle.strError() << std::endl;
+        std::cout << "Could not open input file: " << inputFileHandle.strError() << '\n';
         return;
     } else {
         PrintFileInfo(inputFile);
@@ -113,14 +120,14 @@ void ConvertAudioFile(std::string inputFile, std::string outputFile, int outputF
         inputFileHandle.samplerate());
     // Exit if an error occurred
     if (outputFileHandle.error()) {
-        std::cout << "\tCould not open output file: " << outputFileHandle.strError() << std::endl;
-        std::cout << "\tCheck against specified format (1 = pass): " << outputFileHandle.formatCheck(outputFormat, inputFileHandle.channels(), inputFileHandle.samplerate()) << std::endl;
+        std::cout << "\tCould not open output file: " << outputFileHandle.strError() << '\n';
+        std::cout << "\tCheck against specified format (1 = pass): " << outputFileHandle.formatCheck(outputFormat, inputFileHandle.channels(), inputFileHandle.samplerate()) << '\n';
         return;
     } else { // similar to PrintFileInfo()
-        std::cout << "\tOutput file: " << outputFile << std::endl;
-        std::cout << "\t\tFormat: 0x" << std::hex << outputFileHandle.format() << std::endl;
-        std::cout << "\t\tSample rate: " << std::dec << outputFileHandle.samplerate() << std::endl;
-        std::cout << "\t\tChannels: " << outputFileHandle.channels() << std::endl;
+        std::cout << "\tOutput file: " << outputFile << '\n';
+        std::cout << "\t\tFormat: 0x" << std::hex << outputFileHandle.format() << '\n';
+        std::cout << "\t\tSample rate: " << std::dec << outputFileHandle.samplerate() << '\n';
+        std::cout << "\t\tChannels: " << outputFileHandle.channels() << '\n';
     }
 
     // Initialize conversion buffer
@@ -143,23 +150,21 @@ void ConvertAudioFile(std::string inputFile, std::string outputFile, int outputF
         }
     }
 
-    std::cout << "\tFinished file conversion." << std::endl;
+    std::cout << "\tFinished file conversion." << '\n';
     // std::cout << " Reached end of input file. Last read: " << read << std::endl;
     if (write == 0) {
         //     std::cout << "Warning: Last write was 0 bytes! Last write: " << write << "\n" << std::endl;
     } else {
         //     std::cout << "Last write: " << write << "\n" << std::endl;
     }
-
-    return;
 }
 
-void ConvertWavToFlacInDir(std::string starting_path)
+void ConvertWavToFlacInDir(std::string const& starting_path)
 {
     for (auto const& dir_entry : std::filesystem::directory_iterator(starting_path)) {
         if (dir_entry.is_regular_file()) {
             if (dir_entry.path().extension() == ".wav") {
-                std::cout << "Converting wav file: " << dir_entry.path().filename() << std::endl;
+                std::cout << "Converting wav file: " << dir_entry.path().filename() << '\n';
 
                 std::string outputFile = dir_entry.path().parent_path();
                 outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
@@ -175,12 +180,12 @@ void ConvertWavToFlacInDir(std::string starting_path)
     }
 }
 
-void ConvertWavToFlacInDirTree(std::string starting_path)
+void ConvertWavToFlacInDirTree(std::string const& starting_path)
 {
     for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(starting_path)) {
         if (dir_entry.is_regular_file()) {
             if (dir_entry.path().extension() == ".wav") {
-                std::cout << "Converting wav file: " << dir_entry.path().filename() << std::endl;
+                std::cout << "Converting wav file: " << dir_entry.path().filename() << '\n';
 
                 std::string outputFile = dir_entry.path().parent_path();
                 outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
@@ -195,6 +200,8 @@ void ConvertWavToFlacInDirTree(std::string starting_path)
         }
     }
 }
+
+} // namespace
 
 int main(int argc, char** argv)
 {
@@ -202,24 +209,24 @@ int main(int argc, char** argv)
     if (argc == 2) {
         std::string help_flag = argv[1];
         if (help_flag == "--help") {
-            std::cout << "auconv v0.01: a basic WAV to FLAC converter" << std::endl;
-            std::cout << "Usage: auconv [mode] [path]" << std::endl;
-            std::cout << "Modes:" << std::endl;
-            std::cout << "\t-s: convert single file. [path] is path to file." << std::endl;
-            std::cout << "\t-d: convert all files in a single directory. [path] is path to directory." << std::endl;
-            std::cout << "\t-t: convert all files in a directory and all its subdirectories. [path] is path to top directory." << std::endl;
+            std::cout << "auconv v0.01: a basic WAV to FLAC converter" << '\n';
+            std::cout << "Usage: auconv [mode] [path]" << '\n';
+            std::cout << "Modes:" << '\n';
+            std::cout << "\t-s: convert single file. [path] is path to file." << '\n';
+            std::cout << "\t-d: convert all files in a single directory. [path] is path to directory." << '\n';
+            std::cout << "\t-t: convert all files in a directory and all its subdirectories. [path] is path to top directory." << '\n';
             std::cout << "Path: must be absolute path, e.g. /home/user/audio/wav/, or '.' for current directory\n"
-                      << std::endl;
+                      << '\n';
 
             return 1;
         } else {
-            std::cout << "Incorrect number of arguments. Use auconv --help" << std::endl;
+            std::cout << "Incorrect number of arguments. Use auconv --help" << '\n';
             return 1;
         }
     }
 
     if (argc != 3) {
-        std::cout << "Incorrect number of arguments. Use auconv --help" << std::endl;
+        std::cout << "Incorrect number of arguments. Use auconv --help" << '\n';
         return 1;
     }
 
@@ -232,19 +239,19 @@ int main(int argc, char** argv)
     }
 
     if (!std::filesystem::exists(starting_path)) {
-        std::cout << "Path does not exist." << std::endl;
+        std::cout << "Path does not exist." << '\n';
         return 1;
     }
 
     // Single file
     if (mode_flag == "-s") {
         if (!starting_path.has_filename()) {
-            std::cout << "Path must be a file, not a directory." << std::endl;
+            std::cout << "Path must be a file, not a directory." << '\n';
             return 1;
         }
 
         if (starting_path.extension() == ".wav") {
-            std::cout << "Converting wav file: " << starting_path.filename() << std::endl;
+            std::cout << "Converting wav file: " << starting_path.filename() << '\n';
 
             std::string outputFile = starting_path.parent_path();
             outputFile.append("/").append(starting_path.stem()).append(".flac");
@@ -259,7 +266,7 @@ int main(int argc, char** argv)
     else if (mode_flag == "-d") {
         // Check if path is to a file
         if (starting_path.has_filename()) {
-            std::cout << "Path must be a directory, not a file, when using '-d'" << std::endl;
+            std::cout << "Path must be a directory, not a file, when using '-d'" << '\n';
             return 1;
         }
 
@@ -269,17 +276,17 @@ int main(int argc, char** argv)
     else if (mode_flag == "-t") {
         // Check if path is to a file
         if (starting_path.has_filename()) {
-            std::cout << "Path must be a directory, not a file, when using '-t'" << std::endl;
+            std::cout << "Path must be a directory, not a file, when using '-t'" << '\n';
             return 1;
         }
 
         ConvertWavToFlacInDirTree(starting_path);
     } else {
-        std::cout << "Unspecified conversion mode. Use auconv --help" << std::endl;
+        std::cout << "Unspecified conversion mode. Use auconv --help" << '\n';
         return 1;
     }
 
-    std::cout << "Converted all audio files." << std::endl;
+    std::cout << "Converted all audio files." << '\n';
 
     return 0;
 }
