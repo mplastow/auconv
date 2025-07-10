@@ -55,7 +55,7 @@ pub fn build(b: *std.Build) void {
         "-std=c++23", // C++ 23
         "-g", // Include debug information in binary
         "-ggdb3", // Maximizes debug information
-        "-O0", // Optimization level: Og = debug, Os = size, O3 = maximum
+        "-O2", // Optimization level: Og = debug, Os = size, O2 = good, O3 = maximum
 
         // Warning flags
         "-Wall", // Reasonable default warnings
@@ -79,9 +79,11 @@ pub fn build(b: *std.Build) void {
         "-Wunused-template", // Warns on unused templates
 
         // Sanitizers / Hardeners
-        // "-fsanitize=undefined,bounds,implicit-conversion,nullability,unsigned-integer-overflow", // UB Sanitizer
-        // "-fsanitize-trap=undefined,bounds,implicit-conversion,nullability,unsigned-integer-overflow", // UB Sanitizer handles UB by trapping
-        "-fno-omit-frame-pointer", // Must be set (along with -g) to get proper debug information in the binary
+        // "unsigned-integer-overflow" is an option for -fsanitize, but we should not be using unsigned integers except
+        //  in situations where overflowing is desirable or mandated by the language! So don't include it!
+        "-fsanitize=undefined,bounds,implicit-conversion,nullability", // UB Sanitizer
+        "-fsanitize-trap=undefined,bounds,implicit-conversion,nullability", // UB Sanitizer handles UB by trapping
+        "-fno-omit-frame-pointer", // Must be set (along with -g) to get proper debug information in the binary. Can remove for release builds.
         "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG", // libc++ hardening mode. Note: possibly? inferred by zig cc from -Ox and -fsanitize=undefined flags
         "-ftrivial-auto-var-init=pattern", // Overwrites uninitialized memory with a pattern
         "-pedantic-errors", // "Reject all forbidden compiler extensions." Also appears to always turn -Wpendantic warnings into errors.
@@ -91,11 +93,11 @@ pub fn build(b: *std.Build) void {
         // "-fno-rtti", // Disables runtime type info (commented-out here because it may be incompatible with a UBSan feature)
 
         // Useful flags
-        // "-fwrapv", // Traps on signed integer overflow (to be consistent with UBSan). Set either this or "-fwrapv"
+        // "-ftrapv", // Traps on signed integer overflow (to be consistent with UBSan). Set either this or "-fwrapv"
         // "-fwrapv", // Treats signed integer overflow as two’s complement (wraps around). Set either this or "-ftrapv"
         "-fstrict-aliasing", // Enables optimizations based on the assumption of strict aliasing
         "-fstrict-enums", // Enables optimizations based on the strict definition of an enum’s value range
-        "-ftime-trace", // Outputs a Chrome Tracing .json object containing a compiler performance report
+        // "-ftime-trace", // Outputs a Chrome Tracing .json object containing a compiler performance report
 
         // // Flags to DISABLE warnings -- for use with -Werror
         // "-Wno-cast-qual", // Disables warning when a pointer is cast so as to remove a type qualifier
