@@ -20,7 +20,7 @@ auto main(int argc, char* argv[]) -> int
         arg_vec.emplace_back(argv[i]);
     }
 
-    auto parsed_args = auconv::parseCLIArguments(arg_vec);
+    auto parsed_args = auconv::handleCLIArguments(arg_vec);
 
     // TODO(MATT): do something with parsed args
 

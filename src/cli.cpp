@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <cli.hpp>
@@ -16,60 +17,92 @@ using Path = std::filesystem::path;
 
 namespace {
 
-    // TODO(MATT): Break this massive function up into comprehensible parts
-    void beginAudioConversion(ArgVec const& args)
+    // Got a certain path type, but want another
+    void wrongPathType(PathType got, PathType want)
     {
-        std::string mode_flag { args[1] };
-        Path user_path { args[2] };
-
-        auto starting_path = std::filesystem::current_path();
-        if (user_path != ".") {
-            starting_path = user_path;
+        // Reflection would be good for this task
+        std::string_view mode_str {};
+        switch (want) {
+        case PathType::File: {
+            mode_str = "'-s'";
+        } break;
+        case PathType::Directory: {
+            mode_str = "'-d'";
+        } break;
+        case PathType::DirectoryTree: {
+            mode_str = "'-t'";
+        }
         }
 
-        if (!std::filesystem::exists(starting_path)) {
-            std::cout << "Path does not exist." << '\n';
+        switch (got) {
+        case PathType::File: {
+            std::cout << "Path must be a file, not a directory, when using " << mode_str << '\n';
+        } break;
+        default: {
+            std::cout << "Path must be a directory, not a file, when using " << mode_str << '\n';
+        }
+        }
+    };
+
+    void convertFile(Path const& path)
+    {
+        if (!path.has_filename()) {
+            wrongPathType(PathType::Directory, PathType::File);
+        }
+
+        if (path.extension() == ".wav") {
+            std::cout << "Converting wav file: " << path.filename() << '\n';
+
+            std::string outputFile = path.parent_path();
+            outputFile.append("/").append(path.stem()).append(".flac");
+
+            auconv::convertAudioFile(
+                path,
+                outputFile,
+                SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
+        }
+    }
+
+    void convertDirectory(Path const& path)
+    {
+        if (path.has_filename()) {
+            wrongPathType(PathType::File, PathType::Directory);
+        }
+
+        auconv::convertWavToFlacInDir(path);
+    }
+
+    void convertDirectoryTree(Path const& path)
+    {
+        if (path.has_filename()) {
+            wrongPathType(PathType::File, PathType::DirectoryTree);
+        }
+
+        auconv::convertWavToFlacInDirTree(path);
+    }
+
+    ParsedArgs parseArgs(ArgVec const& args)
+    {
+        std::string const& mode { args[1] };
+        Path path { args[2] };
+
+        // TODO(MATT): Test whether this is a redundant operation
+        if (path == ".") {
+            path = std::filesystem::current_path();
+        }
+
+        if (!std::filesystem::exists(path)) {
+            std::cout << "The path you provided is not valid." << '\n';
             std::quick_exit(1);
         }
 
-        // Single file
-        if (mode_flag == "-s") {
-            if (!starting_path.has_filename()) {
-                std::cout << "Path must be a file, not a directory." << '\n';
-                std::quick_exit(1);
-            }
-
-            if (starting_path.extension() == ".wav") {
-                std::cout << "Converting wav file: " << starting_path.filename() << '\n';
-
-                std::string outputFile = starting_path.parent_path();
-                outputFile.append("/").append(starting_path.stem()).append(".flac");
-
-                auconv::convertAudioFile(
-                    starting_path,
-                    outputFile,
-                    SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
-            }
-        }
-        // Directory, all items
-        else if (mode_flag == "-d") {
-            // Check if path is to a file
-            if (starting_path.has_filename()) {
-                std::cout << "Path must be a directory, not a file, when using '-d'" << '\n';
-                std::quick_exit(1);
-            }
-
-            auconv::convertWavToFlacInDir(starting_path);
-        }
-        // Directory tree, all items
-        else if (mode_flag == "-t") {
-            // Check if path is to a file
-            if (starting_path.has_filename()) {
-                std::cout << "Path must be a directory, not a file, when using '-t'" << '\n';
-                std::quick_exit(1);
-            }
-
-            auconv::convertWavToFlacInDirTree(starting_path);
+        // TODO(MATT): Don't dispatch work from here; parsed to ParsedArgs instead
+        if (mode == "-s") {
+            convertFile(path);
+        } else if (mode == "-d") {
+            convertDirectory(path);
+        } else if (mode == "-t") {
+            convertDirectoryTree(path);
         } else {
             std::cout << "Unspecified conversion mode. Use auconv --help" << '\n';
             std::quick_exit(1);
@@ -110,11 +143,9 @@ namespace {
 
 } // namespace
 
-// TODO(MATT): Rather than doing all work immediately, return a parsed CLI arg object
-//  to the callsite and let the callsite handle it.
-ParsedArgs parseCLIArguments(ArgVec const& args)
+ParsedArgs handleCLIArguments(ArgVec const& args)
 {
-    printArgs(args);
+    printArgs(args); // TODO(MATT): get rid of this eventually
 
     switch (args.size()) {
     case 2: {
@@ -125,7 +156,7 @@ ParsedArgs parseCLIArguments(ArgVec const& args)
         }
     } break;
     case 3: {
-        beginAudioConversion(args);
+        return parseArgs(args);
     } break;
 
     default: {
@@ -133,7 +164,7 @@ ParsedArgs parseCLIArguments(ArgVec const& args)
     }
     }
 
-    return ParsedArgs {};
+    std::unreachable();
 }
 
 } // namespace auconv

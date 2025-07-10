@@ -7,9 +7,11 @@
 
 namespace auconv {
 
-void convertWavToFlacInDir(std::filesystem::path const& starting_path);
+using Path = std::filesystem::path;
 
-void convertWavToFlacInDirTree(std::filesystem::path const& starting_path);
+void convertWavToFlacInDir(Path const& path);
+
+void convertWavToFlacInDirTree(Path const& path);
 
 } // namespace auconv
 
