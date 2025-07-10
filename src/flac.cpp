@@ -21,7 +21,7 @@ void convertWavToFlacInDir(std::filesystem::path const& starting_path)
                 std::string outputFile = dir_entry.path().parent_path();
                 outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
 
-                convertAudioFile(
+                convertFile(
                     dir_entry.path(),
                     outputFile,
                     SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
@@ -42,7 +42,7 @@ void convertWavToFlacInDirTree(std::filesystem::path const& starting_path)
                 std::string outputFile = dir_entry.path().parent_path();
                 outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
 
-                convertAudioFile(
+                convertFile(
                     dir_entry.path(),
                     outputFile,
                     SF_FORMAT_FLAC | SF_FORMAT_PCM_16);

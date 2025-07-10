@@ -7,7 +7,7 @@
 
 namespace auconv {
 
-void convertAudioFile(
+void convertFile(
     std::filesystem::path const& inputFile,
     std::filesystem::path const& outputFile,
     int outputFormat)

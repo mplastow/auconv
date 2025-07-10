@@ -9,12 +9,12 @@
 
 namespace { // provides internal linkage for `main.cpp`
 
-using ArgVec = std::vector<std::string>;
-
 } // namespace
 
 auto main(int argc, char* argv[]) -> int
 {
+    using ArgVec = std::vector<std::string>;
+
     ArgVec arg_vec {};
     for (int i { 0 }; i < argc; ++i) {
         arg_vec.emplace_back(argv[i]);
@@ -23,6 +23,7 @@ auto main(int argc, char* argv[]) -> int
     auto parsed_args = auconv::handleCLIArguments(arg_vec);
 
     // TODO(MATT): do something with parsed args
+    // auconv::scheduleConversion(parsed_args);
 
     std::quick_exit(0);
 }

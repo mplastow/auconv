@@ -1,5 +1,6 @@
 // cli.cpp - auconv
 
+#include <cstdlib>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -18,20 +19,39 @@ using Path = std::filesystem::path;
 namespace {
 
     // Got a certain path type, but want another
-    void wrongPathType(PathType got, PathType want)
+    void validatePath(Path const& path, PathType want)
     {
-        // Reflection would be good for this task
         std::string_view mode_str {};
+        auto got { PathType::Invalid };
         switch (want) {
         case PathType::File: {
-            mode_str = "'-s'";
+            if (std::filesystem::is_directory(path)) {
+                got = PathType::Directory;
+                mode_str = "'-s'";
+            } else {
+                return;
+            }
         } break;
         case PathType::Directory: {
-            mode_str = "'-d'";
+            if (std::filesystem::is_regular_file(path)) {
+                got = PathType::File;
+                mode_str = "'-d'";
+            } else {
+                return;
+            }
         } break;
         case PathType::DirectoryTree: {
-            mode_str = "'-t'";
-        }
+            if (std::filesystem::is_regular_file(path)) {
+                got = PathType::File;
+                mode_str = "'-t'";
+            } else {
+                return;
+            }
+        } break;
+        case PathType::Invalid: {
+            std::cout << "Unspecified conversion mode. Use auconv --help" << '\n';
+            std::quick_exit(1);
+        } break;
         }
 
         switch (got) {
@@ -42,13 +62,13 @@ namespace {
             std::cout << "Path must be a directory, not a file, when using " << mode_str << '\n';
         }
         }
-    };
+
+        std::quick_exit(1);
+    }
 
     void convertFile(Path const& path)
     {
-        if (!path.has_filename()) {
-            wrongPathType(PathType::Directory, PathType::File);
-        }
+        validatePath(path, PathType::File);
 
         if (path.extension() == ".wav") {
             std::cout << "Converting wav file: " << path.filename() << '\n';
@@ -56,7 +76,7 @@ namespace {
             std::string outputFile = path.parent_path();
             outputFile.append("/").append(path.stem()).append(".flac");
 
-            auconv::convertAudioFile(
+            auconv::convertFile(
                 path,
                 outputFile,
                 SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
@@ -65,50 +85,55 @@ namespace {
 
     void convertDirectory(Path const& path)
     {
-        if (path.has_filename()) {
-            wrongPathType(PathType::File, PathType::Directory);
-        }
+        validatePath(path, PathType::Directory);
 
         auconv::convertWavToFlacInDir(path);
     }
 
     void convertDirectoryTree(Path const& path)
     {
-        if (path.has_filename()) {
-            wrongPathType(PathType::File, PathType::DirectoryTree);
-        }
+        validatePath(path, PathType::DirectoryTree);
 
         auconv::convertWavToFlacInDirTree(path);
     }
 
     ParsedArgs parseArgs(ArgVec const& args)
     {
-        std::string const& mode { args[1] };
         Path path { args[2] };
 
         // TODO(MATT): Test whether this is a redundant operation
         if (path == ".") {
             path = std::filesystem::current_path();
         }
-
         if (!std::filesystem::exists(path)) {
             std::cout << "The path you provided is not valid." << '\n';
             std::quick_exit(1);
         }
 
-        // TODO(MATT): Don't dispatch work from here; parsed to ParsedArgs instead
-        if (mode == "-s") {
-            convertFile(path);
+        ParsedArgs parsed_args { .path = path, .mode = PathType::Invalid };
+
+        std::string_view mode { args[1] };
+        // TODO(MATT): Don't dispatch work from here; instead, parse and handle elsewhere
+        if (mode == "-s" || mode == "-f") {
+            parsed_args.mode = PathType::File;
+            convertFile(path); // TODO(MATT): gotta go!
         } else if (mode == "-d") {
-            convertDirectory(path);
+            parsed_args.mode = PathType::Directory;
+            convertDirectory(path); // TODO(MATT): gotta go!
         } else if (mode == "-t") {
-            convertDirectoryTree(path);
+            parsed_args.mode = PathType::DirectoryTree;
+            convertDirectoryTree(path); // TODO(MATT): gotta go!
         } else {
-            std::cout << "Unspecified conversion mode. Use auconv --help" << '\n';
+            parsed_args.mode = PathType::Invalid;
+            std::cout << "Unspecified conversion mode. Use auconv --help" << '\n'; // TODO(MATT): gotta go!
             std::quick_exit(1);
         }
 
-        std::cout << "Converted all audio files." << '\n';
+        // TODO(MATT): Parse args for input and output
+
+        std::cout << "Converted all audio files." << '\n'; // TODO(MATT): gotta go!
+
+        return parsed_args;
     }
 
     void printArgs(ArgVec const& args)
@@ -126,7 +151,7 @@ namespace {
         std::cout << "auconv v0.01: a basic WAV to FLAC converter" << '\n';
         std::cout << "Usage: auconv [mode] [path]" << '\n';
         std::cout << "Modes:" << '\n';
-        std::cout << "\t-s: convert single file. [path] is path to file." << '\n';
+        std::cout << "\t-s, -f: convert single file. [path] is path to file." << '\n';
         std::cout << "\t-d: convert all files in a single directory. [path] is path to directory." << '\n';
         std::cout << "\t-t: convert all files in a directory and all its subdirectories. [path] is path to top directory." << '\n';
         std::cout << "Path: must be absolute path, e.g. /home/user/audio/wav/, or '.' for current directory\n"
