@@ -1,25 +1,11 @@
 {
-    "version": "2.0.0",
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++ build active file",
-            "command": "/usr/bin/g++",
+            "label": "zig build",
+            "command": "zig",
             "args": [
-                "-fdiagnostics-color=always",
-                "-std=c++17",
-                "-Wall",
-                "-Werror",
-                "-g",
-                "${file}",
-                "-o",
-                "${workspaceFolder}/bin/${fileBasenameNoExtension}",
-                "-I/home/kobaybeefu/libsndfile/include/",
-                "-I/home/kobaybeefu/lame-svn/include/",
-                "-I/home/kobaybeefu/libmpg123/src/include/",
-                "-lmp3lame",
-                "-lmpg123",
-                "-lsndfile"
+                "build",
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -31,7 +17,8 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "compiler: /usr/bin/g++"
-        },
-    ]
+            "detail": "Build with `zig build`"
+        }
+    ],
+    "version": "2.0.0"
 }

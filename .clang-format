@@ -1,0 +1,7 @@
+BasedOnStyle: WebKit
+
+SortIncludes: false
+
+AlignTrailingComments: true
+
+ColumnLimit: 0

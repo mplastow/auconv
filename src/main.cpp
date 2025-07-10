@@ -4,7 +4,7 @@
 #include <string>
 #include <filesystem>
 
-#include <lame.h>
+#include <lame/lame.h>
 #include <sndfile.hh>
 #include <sndfile.h>
 
@@ -12,7 +12,8 @@ constexpr int BUFFER_SIZE = 1024; // 1kb buffer
 constexpr int MP3_BUFFER_SIZE = BUFFER_SIZE;
 constexpr int PCM_BUFFER_SIZE = BUFFER_SIZE * 2;
 
-void PrintFileInfo(std::string inputFile) {
+void PrintFileInfo(std::string inputFile)
+{
     // Print file properties with libsndfile
     SndfileHandle inputFileHandle = SndfileHandle(inputFile);
     if (inputFileHandle.error()) {
@@ -27,7 +28,8 @@ void PrintFileInfo(std::string inputFile) {
     }
 }
 
-lame_global_flags* InitLameWithFlags() {
+lame_global_flags* InitLameWithFlags()
+{
     // Initialize LAME
     // Create global flags object
     lame_global_flags* gfp = lame_init();
@@ -38,11 +40,11 @@ lame_global_flags* InitLameWithFlags() {
     lame_set_in_samplerate(gfp, 44100);     /* sample rate is 44.1k or 48k */
     lame_set_num_channels(gfp, 2);          /* 1 for mono, 2 for joint/stereo */
     // Output stream flags TODO: find optimal settings
-    lame_set_out_samplerate(gfp, 44100);    /* sample rate is 44.1k or 48k */
-    lame_set_mode(gfp, JOINT_STEREO);       /* mono, stereo, joint stereo */
-    lame_set_quality(gfp, 0);               /* 0 = best 2 = high 5 = med 7 = low */
-    lame_set_brate(gfp, 320);               /* max bitrate = 320 kbps */
-    lame_set_compression_ratio(gfp, 11);    /* default compression ratio = 11 */
+    lame_set_out_samplerate(gfp, 44100); /* sample rate is 44.1k or 48k */
+    lame_set_mode(gfp, JOINT_STEREO);    /* mono, stereo, joint stereo */
+    lame_set_quality(gfp, 0);            /* 0 = best 2 = high 5 = med 7 = low */
+    lame_set_brate(gfp, 320);            /* max bitrate = 320 kbps */
+    lame_set_compression_ratio(gfp, 11); /* default compression ratio = 11 */
 
     // int ret_code = lame_init_params(gfp);
     // Check for problems: ret_code must be >= 0
@@ -51,7 +53,8 @@ lame_global_flags* InitLameWithFlags() {
     return gfp;
 }
 
-void ConvertWavToMp3(const std::string inputFile, const std::string outputFile) {
+void ConvertWavToMp3(const std::string inputFile, const std::string outputFile)
+{
     // mp3 conversion with libmp3lame
     // See https://stackoverflow.com/a/2496831/22896065
     lame_global_flags* gfp = InitLameWithFlags();
@@ -90,7 +93,8 @@ void ConvertWavToMp3(const std::string inputFile, const std::string outputFile) 
     lame_close(gfp);
 }
 
-void ConvertAudioFile(std::string inputFile, std::string outputFile, int outputFormat) {
+void ConvertAudioFile(std::string inputFile, std::string outputFile, int outputFormat)
+{
     // Get handle to input file
     SndfileHandle inputFileHandle = SndfileHandle(inputFile);
     if (inputFileHandle.error()) {
@@ -106,14 +110,13 @@ void ConvertAudioFile(std::string inputFile, std::string outputFile, int outputF
         SFM_WRITE,
         outputFormat,
         inputFileHandle.channels(),
-        inputFileHandle.samplerate()
-    );
+        inputFileHandle.samplerate());
     // Exit if an error occurred
     if (outputFileHandle.error()) {
         std::cout << "\tCould not open output file: " << outputFileHandle.strError() << std::endl;
         std::cout << "\tCheck against specified format (1 = pass): " << outputFileHandle.formatCheck(outputFormat, inputFileHandle.channels(), inputFileHandle.samplerate()) << std::endl;
         return;
-    } else {    // similar to PrintFileInfo()
+    } else { // similar to PrintFileInfo()
         std::cout << "\tOutput file: " << outputFile << std::endl;
         std::cout << "\t\tFormat: 0x" << std::hex << outputFileHandle.format() << std::endl;
         std::cout << "\t\tSample rate: " << std::dec << outputFileHandle.samplerate() << std::endl;
@@ -133,8 +136,8 @@ void ConvertAudioFile(std::string inputFile, std::string outputFile, int outputF
     while (read != 0) {
         read = inputFileHandle.read(buffer, BUFFER_SIZE);
         // std::cout << "Read: " << read << std::endl;
-        
-        if (read != 0) {    // write to out if bytes were read
+
+        if (read != 0) { // write to out if bytes were read
             write = outputFileHandle.write(buffer, read);
             // std::cout << "Write: " << write << std::endl;
         }
@@ -143,15 +146,16 @@ void ConvertAudioFile(std::string inputFile, std::string outputFile, int outputF
     std::cout << "\tFinished file conversion." << std::endl;
     // std::cout << " Reached end of input file. Last read: " << read << std::endl;
     if (write == 0) {
-    //     std::cout << "Warning: Last write was 0 bytes! Last write: " << write << "\n" << std::endl;
+        //     std::cout << "Warning: Last write was 0 bytes! Last write: " << write << "\n" << std::endl;
     } else {
-    //     std::cout << "Last write: " << write << "\n" << std::endl;
+        //     std::cout << "Last write: " << write << "\n" << std::endl;
     }
 
-    return; 
+    return;
 }
 
-void ConvertWavToFlacInDir(std::string starting_path) {
+void ConvertWavToFlacInDir(std::string starting_path)
+{
     for (auto const& dir_entry : std::filesystem::directory_iterator(starting_path)) {
         if (dir_entry.is_regular_file()) {
             if (dir_entry.path().extension() == ".wav") {
@@ -163,16 +167,16 @@ void ConvertWavToFlacInDir(std::string starting_path) {
                 ConvertAudioFile(
                     dir_entry.path(),
                     outputFile,
-                    SF_FORMAT_FLAC | SF_FORMAT_PCM_16
-                );
+                    SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
             }
         } else {
             std::cout << "Directory: " << dir_entry << '\n';
         }
     }
-} 
+}
 
-void ConvertWavToFlacInDirTree(std::string starting_path) {
+void ConvertWavToFlacInDirTree(std::string starting_path)
+{
     for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(starting_path)) {
         if (dir_entry.is_regular_file()) {
             if (dir_entry.path().extension() == ".wav") {
@@ -184,8 +188,7 @@ void ConvertWavToFlacInDirTree(std::string starting_path) {
                 ConvertAudioFile(
                     dir_entry.path(),
                     outputFile,
-                    SF_FORMAT_FLAC | SF_FORMAT_PCM_16
-                );
+                    SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
             }
         } else {
             std::cout << "Directory: " << dir_entry << '\n';
@@ -193,7 +196,8 @@ void ConvertWavToFlacInDirTree(std::string starting_path) {
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 
     if (argc == 2) {
         std::string help_flag = argv[1];
@@ -204,8 +208,9 @@ int main(int argc, char** argv) {
             std::cout << "\t-s: convert single file. [path] is path to file." << std::endl;
             std::cout << "\t-d: convert all files in a single directory. [path] is path to directory." << std::endl;
             std::cout << "\t-t: convert all files in a directory and all its subdirectories. [path] is path to top directory." << std::endl;
-            std::cout << "Path: must be absolute path, e.g. /home/user/audio/wav/, or '.' for current directory\n" << std::endl;
-            
+            std::cout << "Path: must be absolute path, e.g. /home/user/audio/wav/, or '.' for current directory\n"
+                      << std::endl;
+
             return 1;
         } else {
             std::cout << "Incorrect number of arguments. Use auconv --help" << std::endl;
@@ -247,8 +252,7 @@ int main(int argc, char** argv) {
             ConvertAudioFile(
                 starting_path,
                 outputFile,
-                SF_FORMAT_FLAC | SF_FORMAT_PCM_16
-            );
+                SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
         }
     }
     // Directory, all items

@@ -3,15 +3,16 @@
         {
             "name": "Linux",
             "includePath": [
-                "/home/kobaybeefu/libsndfile/include",
-                "/home/kobaybeefu/lame-svn/include",
-                "/home/kobaybeefu/libmpg123/src/include",
                 "${workspaceFolder}/**"
             ],
             "defines": [],
-            "cStandard": "c17",
-            "cppStandard": "gnu++17",
-            "intelliSenseMode": "linux-gcc-x64"
+            "cStandard": "c23",
+            "cppStandard": "c++23",
+            "intelliSenseMode": "linux-clang-x64",
+            "compilerPath": "/usr/bin/clang++-19",
+            "compilerArgs": [
+                "-stdlib=libc++"
+            ]
         }
     ],
     "version": 4
