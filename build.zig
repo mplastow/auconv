@@ -13,7 +13,7 @@ pub fn build(b: *std.Build) void {
     ////////////////////////////////////////////////////////////////////////////
     // Build and install a C++ library
     //
-    // TODO(MATT): use this template to build libsndfile and libmp3lame
+    // TODO(MATT): use this template to build libsndfile, libmp3lame, ...
     const lib = b.addStaticLibrary(.{
         .name = "factorial",
         .target = target,
@@ -120,12 +120,13 @@ pub fn build(b: *std.Build) void {
     // Add include paths (one path per folder containing a #include)
     exe.addIncludePath(b.path("include/"));
     exe.addIncludePath(b.path("lib/include/"));
+    exe.addIncludePath(b.path("external/"));
 
     // Link libraries
     // exe.linkLibC(); // when appropriate
     exe.linkLibCpp();
-    exe.linkSystemLibrary("mp3lame"); // TODO(MATT): replace with a built-from-source version
-    exe.linkSystemLibrary("sndfile"); // TODO(MATT): replace with a built-from-source version
+    exe.linkSystemLibrary("mp3lame"); // TODO(MATT): replace with a built-from-source library
+    exe.linkSystemLibrary("sndfile"); // TODO(MATT): replace with a built-from-source library
     // e.g. exe.linkSystemLibrary("SDL3"); // when appropriate
 
     // Add .c and .cpp files along with specified compiler flags

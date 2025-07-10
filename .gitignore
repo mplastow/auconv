@@ -15,6 +15,7 @@ zig-out/
 /debug/
 /build/
 /build-*/
+/data/
 /docgen_tmp/
 /test-audio/
 /bin/

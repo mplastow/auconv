@@ -9,9 +9,9 @@
 #include <sndfile.hh>
 #include <sndfile.h>
 
-constexpr int BUFFER_SIZE = 1024; // 1kb buffer
-constexpr int MP3_BUFFER_SIZE = BUFFER_SIZE;
-constexpr int PCM_BUFFER_SIZE = BUFFER_SIZE * 2;
+constexpr size_t BUFFER_SIZE = 1024;
+constexpr size_t MP3_BUFFER_SIZE = BUFFER_SIZE;
+constexpr size_t PCM_BUFFER_SIZE = BUFFER_SIZE * 2;
 
 constexpr int HZ_44100 = 44100;
 constexpr int BITRATE_320 = 320;
