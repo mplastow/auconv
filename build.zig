@@ -56,6 +56,12 @@ pub fn build(b: *std.Build) void {
     // #includes from any files listed here do not need to be added to this array
     const exe_files = [_][]const u8{
         "src/main.cpp",
+
+        "src/cli.cpp",
+        "src/files.cpp",
+        "src/flac.cpp",
+        "src/mp3.cpp",
+        "src/snd.cpp",
     };
     // Array of clang compiler flags to pass to addCSourceFiles()
     const exe_flags = [_][]const u8{
@@ -91,6 +97,7 @@ pub fn build(b: *std.Build) void {
         //  in situations where overflowing is desirable or mandated by the language! So don't include it!
         "-fsanitize=undefined,bounds,implicit-conversion,nullability", // UB Sanitizer
         "-fsanitize-trap=undefined,bounds,implicit-conversion,nullability", // UB Sanitizer handles UB by trapping
+        "-fsafe-buffer-usage-suggestions", // "semi-automatically transform large bodies of code to follow the C++ Safe Buffers programming model"
         "-fno-omit-frame-pointer", // Must be set (along with -g) to get proper debug information in the binary. Can remove for release builds.
         "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG", // libc++ hardening mode. Note: possibly? inferred by zig cc from -Ox and -fsanitize=undefined flags
         "-ftrivial-auto-var-init=pattern", // Overwrites uninitialized memory with a pattern

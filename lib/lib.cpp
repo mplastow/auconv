@@ -1,3 +1,5 @@
+// TODO(MATT): This library isn't used in auconv and so this file should be removed!
+
 // lib.cpp
 // A demo library containing only factorial()
 

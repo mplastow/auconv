@@ -1,18 +1,12 @@
 // main.cpp - auconv
 
-#include <iostream>
 #include <cstdio>
-#include <string>
 #include <filesystem>
+#include <iostream>
+#include <string>
+#include <vector>
 
-#include <lame/lame.h>
-#include <sndfile.hh>
-#include <sndfile.h>
-
-#include <defines.hpp>
-#include <files.hpp>
 #include <flac.hpp>
-#include <mp3.hpp>
 #include <snd.hpp>
 
 namespace { // provides internal linkage for `main.cpp`
@@ -21,6 +15,12 @@ namespace { // provides internal linkage for `main.cpp`
 
 auto main(int argc, char* argv[]) -> int
 {
+    auto argv_vec = std::vector<std::string> {};
+    for (int i { 0 }; i < argc; ++i) {
+        argv_vec.emplace_back(argv[i]);
+    }
+    // TODO(MATT): parseCLIFlags();
+
     if (argc == 2) {
         std::string help_flag = argv[1];
         if (help_flag == "--help") {
@@ -46,11 +46,11 @@ auto main(int argc, char* argv[]) -> int
     }
 
     std::string mode_flag = argv[1];
-    std::string user_path = argv[2];
+    std::filesystem::path user_path = argv[2];
 
     auto starting_path = std::filesystem::current_path();
     if (user_path != ".") {
-        starting_path = std::filesystem::path(user_path);
+        starting_path = user_path;
     }
 
     if (!std::filesystem::exists(starting_path)) {

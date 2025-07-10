@@ -11,7 +11,7 @@ constexpr size_t BUFFER_SIZE = 1024;
 constexpr size_t MP3_BUFFER_SIZE = BUFFER_SIZE;
 constexpr size_t PCM_BUFFER_SIZE = BUFFER_SIZE * 2;
 
-// NOTE(MATT): the following defines are `int` because that's what lame takes
+// NOTE(MATT): The following defines have type `int` because that's what lame takes
 constexpr int HZ_44100 = 44100;
 constexpr int BITRATE_320 = 320;
 constexpr int MP3_COMP_RATIO_DEFAULT = 11;

@@ -1,3 +1,5 @@
+// TODO(MATT): These type aliases aren't used in auconv and so this file should be removed!
+
 // type_aliases.hpp
 
 #ifndef TYPE_ALIASES_HPP
@@ -14,10 +16,10 @@
 using byte = __int8_t; // Use for explicitness when dealing with raw bytes, prefer std::byte
 
 using isize = ssize_t; // All sizes "should be" (?) signed (isize)
-using usize = size_t; // All sizes "should be" (?) signed (isize), prefer std::size_t
+using usize = size_t;  // All sizes "should be" (?) signed (isize), prefer std::size_t
 
-using iptr = intptr_t; // Use for computing address offsets that might be negative, prefer std::intptr_t
-using uptr = uintptr_t; // Use for general address handling, prefer std::ptrdiff_t
+using iptr = intptr_t;   // Use for computing address offsets that might be negative, prefer std::intptr_t
+using uptr = uintptr_t;  // Use for general address handling, prefer std::ptrdiff_t
 using pdiff = ptrdiff_t; // Use for pointer arithmetic and array indexing, prefer std::ptrdiff_t
 
 using u8 = __uint8_t;
@@ -40,7 +42,7 @@ using f128 = __float128;
 
 using b32 = __int32_t; // 32-bit Boolean for API compatability
 
-using c8 = char8_t; // Standard char
+using c8 = char8_t;   // Standard char
 using c16 = char16_t; // Wide char for UTF-16
 using c32 = char32_t; // Extra wide char for UTF-32
 
