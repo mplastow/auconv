@@ -26,6 +26,8 @@ namespace {
 
             // TODO(MATT): multiformat, don't hardcode this!
             auconv::convertWavToFlacFile(path, Path { output }, SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
+        } else {
+            std::cout << "Skipping due to file extension: " << path.filename() << '\n';
         }
     }
 
