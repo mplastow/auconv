@@ -5,67 +5,64 @@
 #include <filesystem>
 #include <iostream>
 
+#include <cli.hpp>
+#include <flac.hpp>
+
 namespace auconv {
 
-void convertFile(
-    std::filesystem::path const& inputFile,
-    std::filesystem::path const& outputFile,
-    int outputFormat)
-{
-    // Get handle to input file
-    SndfileHandle inputFileHandle = SndfileHandle(inputFile);
-    if (inputFileHandle.error()) {
-        std::cout << "Could not open input file: " << inputFileHandle.strError() << '\n';
-        return;
-    } else {
-        printFileInfo(inputFile);
-    }
+using Path = std::filesystem::path;
 
-    // Get handle to output file
-    SndfileHandle outputFileHandle = SndfileHandle(
-        outputFile,
-        SFM_WRITE,
-        outputFormat,
-        inputFileHandle.channels(),
-        inputFileHandle.samplerate());
-    // Exit if an error occurred
-    if (outputFileHandle.error()) {
-        std::cout << "\tCould not open output file: " << outputFileHandle.strError() << '\n';
-        std::cout << "\tCheck against specified format (1 = pass): " << outputFileHandle.formatCheck(outputFormat, inputFileHandle.channels(), inputFileHandle.samplerate()) << '\n';
-        return;
-    } else { // similar to PrintFileInfo()
-        std::cout << "\tOutput file: " << outputFile << '\n';
-        std::cout << "\t\tFormat: 0x" << std::hex << outputFileHandle.format() << '\n';
-        std::cout << "\t\tSample rate: " << std::dec << outputFileHandle.samplerate() << '\n';
-        std::cout << "\t\tChannels: " << outputFileHandle.channels() << '\n';
-    }
+namespace {
 
-    // Initialize conversion buffer
-    static short buffer[BUFFER_SIZE];
-    // std::cout << "Read/write buffer size: " << BUFFER_SIZE << std::endl;
+    // TODO(MATT): multiformat
+    void convertFile(Path const& path)
+    {
 
-    // Initialize read and write objects
-    sf_count_t read = 1;
-    sf_count_t write = 1;
+        if (path.extension() == ".wav") {
+            std::cout << "Converting wav file: " << path.filename() << '\n';
 
-    // Read through file to convert from input format to output format
-    // and write to output file
-    while (read != 0) {
-        read = inputFileHandle.read(buffer, BUFFER_SIZE);
-        // std::cout << "Read: " << read << std::endl;
+            std::string output = path.parent_path();
+            output.append("/").append(path.stem()).append(".flac");
 
-        if (read != 0) { // write to out if bytes were read
-            write = outputFileHandle.write(buffer, read);
-            // std::cout << "Write: " << write << std::endl;
+            // TODO(MATT): multiformat, don't hardcode this!
+            auconv::convertWavToFlacFile(path, Path { output }, SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
         }
     }
 
-    std::cout << "\tFinished file conversion." << '\n';
-    // std::cout << " Reached end of input file. Last read: " << read << std::endl;
-    if (write == 0) {
-        //     std::cout << "Warning: Last write was 0 bytes! Last write: " << write << "\n" << std::endl;
-    } else {
-        //     std::cout << "Last write: " << write << "\n" << std::endl;
+    // TODO(MATT): multiformat
+    void convertDirectory(Path const& path)
+    {
+        // TODO(MATT): multiformat, don't hardcode this!
+        auconv::convertWavToFlacInDir(path);
+    }
+
+    // TODO(MATT): multiformat
+    void convertDirectoryTree(Path const& path)
+    {
+        // TODO(MATT): multiformat, don't hardcode this!
+        auconv::convertWavToFlacInDirTree(path);
+    }
+
+} // namespace
+
+void handleParsedArgs(ParsedArgs const& args)
+{
+    switch (args.mode) {
+    case PathType::File: {
+        convertFile(args.path);
+    } break;
+    case PathType::Directory: {
+        convertDirectory(args.path);
+    } break;
+    case PathType::DirectoryTree: {
+        convertDirectoryTree(args.path);
+    } break;
+    default: {
+        std::cout << "Something went wrong. Dunno what right now. Use auconv --help" << '\n'; // TODO(MATT): gotta go!
+        std::quick_exit(1);
+    }
+
+        std::cout << "Converted all audio files." << '\n'; // TODO(MATT): gotta go!
     }
 }
 

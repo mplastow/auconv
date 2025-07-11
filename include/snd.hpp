@@ -11,10 +11,11 @@
 
 namespace auconv {
 
-void convertFile(
-    std::filesystem::path const& inputFile,
-    std::filesystem::path const& outputFile,
-    int outputFormat);
+struct ParsedArgs;
+
+void handleParsedArgs(ParsedArgs const& args);
+
+using Path = std::filesystem::path;
 
 } // namespace auconv
 

@@ -18,34 +18,41 @@ using Path = std::filesystem::path;
 
 namespace {
 
-    // Got a certain path type, but want another
-    void validatePath(Path const& path, PathType want)
+    // Validate that we got a valid path of the type we want, given the mode flag
+    // Arg name intuition: Here's the `path` we `got`, this is the path we `want`
+    PathType validatePath(Path const& path, PathType want)
     {
         std::string_view mode_str {};
         auto got { PathType::Invalid };
         switch (want) {
         case PathType::File: {
-            if (std::filesystem::is_directory(path)) {
+            if (std::filesystem::is_regular_file(path)) {
+                return PathType::File;
+            } else if (std::filesystem::is_directory(path)) {
                 got = PathType::Directory;
-                mode_str = "'-s'";
+                mode_str = FLAG_MODE_FILE_QUOTED;
             } else {
-                return;
+                return PathType::Invalid;
             }
         } break;
         case PathType::Directory: {
-            if (std::filesystem::is_regular_file(path)) {
+            if (std::filesystem::is_directory(path)) {
+                return PathType::Directory;
+            } else if (std::filesystem::is_regular_file(path)) {
                 got = PathType::File;
-                mode_str = "'-d'";
+                mode_str = FLAG_MODE_DIRECTORY_QUOTED;
             } else {
-                return;
+                return PathType::Invalid;
             }
         } break;
         case PathType::DirectoryTree: {
-            if (std::filesystem::is_regular_file(path)) {
+            if (std::filesystem::is_directory(path)) {
+                return PathType::Directory;
+            } else if (std::filesystem::is_regular_file(path)) {
                 got = PathType::File;
-                mode_str = "'-t'";
+                mode_str = FLAG_MODE_DIRECTORY_TREE_QUOTED;
             } else {
-                return;
+                return PathType::Invalid;
             }
         } break;
         case PathType::Invalid: {
@@ -66,37 +73,6 @@ namespace {
         std::quick_exit(1);
     }
 
-    void convertFile(Path const& path)
-    {
-        validatePath(path, PathType::File);
-
-        if (path.extension() == ".wav") {
-            std::cout << "Converting wav file: " << path.filename() << '\n';
-
-            std::string outputFile = path.parent_path();
-            outputFile.append("/").append(path.stem()).append(".flac");
-
-            auconv::convertFile(
-                path,
-                outputFile,
-                SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
-        }
-    }
-
-    void convertDirectory(Path const& path)
-    {
-        validatePath(path, PathType::Directory);
-
-        auconv::convertWavToFlacInDir(path);
-    }
-
-    void convertDirectoryTree(Path const& path)
-    {
-        validatePath(path, PathType::DirectoryTree);
-
-        auconv::convertWavToFlacInDirTree(path);
-    }
-
     ParsedArgs parseArgs(ArgVec const& args)
     {
         Path path { args[2] };
@@ -114,24 +90,22 @@ namespace {
 
         std::string_view mode { args[1] };
         // TODO(MATT): Don't dispatch work from here; instead, parse and handle elsewhere
-        if (mode == "-s" || mode == "-f") {
+        if (mode == FLAG_MODE_FILE) {
+            validatePath(path, PathType::File);
             parsed_args.mode = PathType::File;
-            convertFile(path); // TODO(MATT): gotta go!
-        } else if (mode == "-d") {
+        } else if (mode == FLAG_MODE_DIRECTORY) {
+            validatePath(path, PathType::Directory);
             parsed_args.mode = PathType::Directory;
-            convertDirectory(path); // TODO(MATT): gotta go!
-        } else if (mode == "-t") {
+        } else if (mode == FLAG_MODE_DIRECTORY_TREE) {
+            validatePath(path, PathType::DirectoryTree);
             parsed_args.mode = PathType::DirectoryTree;
-            convertDirectoryTree(path); // TODO(MATT): gotta go!
         } else {
             parsed_args.mode = PathType::Invalid;
             std::cout << "Unspecified conversion mode. Use auconv --help" << '\n'; // TODO(MATT): gotta go!
             std::quick_exit(1);
         }
 
-        // TODO(MATT): Parse args for input and output
-
-        std::cout << "Converted all audio files." << '\n'; // TODO(MATT): gotta go!
+        // TODO(MATT): Parse args for input and output types
 
         return parsed_args;
     }

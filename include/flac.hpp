@@ -9,6 +9,8 @@ namespace auconv {
 
 using Path = std::filesystem::path;
 
+void convertWavToFlacFile(Path const& input, Path const& output, int out_format);
+
 void convertWavToFlacInDir(Path const& path);
 
 void convertWavToFlacInDirTree(Path const& path);

@@ -9,6 +9,14 @@
 
 namespace auconv {
 
+constexpr std::string FLAG_MODE_FILE = "-s";
+constexpr std::string FLAG_MODE_DIRECTORY = "-d";
+constexpr std::string FLAG_MODE_DIRECTORY_TREE = "-t";
+
+constexpr std::string FLAG_MODE_FILE_QUOTED = "'-s'";
+constexpr std::string FLAG_MODE_DIRECTORY_TREE_QUOTED = "'-t'";
+constexpr std::string FLAG_MODE_DIRECTORY_QUOTED = "'-d'";
+
 // Specifies the type of path; implicitly specifies what to convert
 // TODO(MATT): May want to pry apart the type of path from the conversion mode...
 //  ...but it may be redundant
@@ -39,6 +47,8 @@ enum struct OutFormat : int_fast8_t {
 struct ParsedArgs {
     std::filesystem::path path; // conversion target path
     PathType mode = PathType::File;
+    InFormat in_format = InFormat::all;
+    OutFormat out_Format = OutFormat::flac;
 };
 
 ParsedArgs handleCLIArguments(std::vector<std::string> const& args);

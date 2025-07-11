@@ -22,8 +22,7 @@ auto main(int argc, char* argv[]) -> int
 
     auto parsed_args = auconv::handleCLIArguments(arg_vec);
 
-    // TODO(MATT): do something with parsed args
-    // auconv::scheduleConversion(parsed_args);
+    auconv::handleParsedArgs(parsed_args);
 
     std::quick_exit(0);
 }
