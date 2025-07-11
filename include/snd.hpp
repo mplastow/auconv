@@ -8,10 +8,9 @@
 
 #include <defines.hpp>
 #include <files.hpp>
+#include <types.hpp>
 
 namespace auconv {
-
-struct ParsedArgs;
 
 void handleParsedArgs(ParsedArgs const& args);
 

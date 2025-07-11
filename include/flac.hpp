@@ -4,6 +4,7 @@
 #define AUCONV_FLAC_HPP
 
 #include <defines.hpp>
+#include <types.hpp>
 
 namespace auconv {
 

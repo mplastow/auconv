@@ -10,6 +10,7 @@
 
 #include <defines.hpp>
 #include <files.hpp>
+#include <types.hpp>
 
 namespace auconv {
 

@@ -5,6 +5,7 @@
 #include <defines.hpp>
 #include <cli.hpp>
 #include <snd.hpp>
+#include <types.hpp>
 
 auto main(int argc, char* argv[]) -> int
 {

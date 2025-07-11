@@ -8,6 +8,7 @@
 #include <cli.hpp>
 #include <defines.hpp>
 #include <flac.hpp>
+#include <types.hpp>
 
 namespace auconv {
 

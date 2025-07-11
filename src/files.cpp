@@ -7,6 +7,7 @@
 #include <sndfile.hh>
 
 #include <defines.hpp>
+#include <types.hpp>
 
 namespace auconv {
 

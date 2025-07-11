@@ -9,6 +9,7 @@
 #include <defines.hpp>
 #include <flac.hpp>
 #include <snd.hpp>
+#include <types.hpp>
 
 namespace auconv {
 

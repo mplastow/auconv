@@ -6,6 +6,7 @@
 #include <lame/lame.h>
 
 #include <defines.hpp>
+#include <types.hpp>
 
 namespace auconv {
 
