@@ -57,12 +57,14 @@ void handleParsedArgs(ParsedArgs const& args)
     case PathType::DirectoryTree: {
         convertDirectoryTree(args.path);
     } break;
+    case PathType::Invalid: {
+        std::quick_exit(1);
+    } break;
     default: {
-        std::cout << "Something went wrong. Dunno what right now. Use auconv --help" << '\n'; // TODO(MATT): gotta go!
         std::quick_exit(1);
     }
 
-        std::cout << "Converted all audio files." << '\n'; // TODO(MATT): gotta go!
+        std::cout << "Converted all audio files." << '\n';
     }
 }
 

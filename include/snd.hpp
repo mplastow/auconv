@@ -15,8 +15,6 @@ struct ParsedArgs;
 
 void handleParsedArgs(ParsedArgs const& args);
 
-using Path = std::filesystem::path;
-
 } // namespace auconv
 
 #endif // AUCONV_SND_HPP

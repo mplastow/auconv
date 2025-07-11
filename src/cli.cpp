@@ -25,6 +25,7 @@ namespace {
         std::string_view mode_str {};
         auto got { PathType::Invalid };
         switch (want) {
+
         case PathType::File: {
             if (std::filesystem::is_regular_file(path)) {
                 return PathType::File;
@@ -35,6 +36,7 @@ namespace {
                 return PathType::Invalid;
             }
         } break;
+
         case PathType::Directory: {
             if (std::filesystem::is_directory(path)) {
                 return PathType::Directory;
@@ -45,9 +47,10 @@ namespace {
                 return PathType::Invalid;
             }
         } break;
+
         case PathType::DirectoryTree: {
             if (std::filesystem::is_directory(path)) {
-                return PathType::Directory;
+                return PathType::DirectoryTree;
             } else if (std::filesystem::is_regular_file(path)) {
                 got = PathType::File;
                 mode_str = FLAG_MODE_DIRECTORY_TREE_QUOTED;
@@ -55,6 +58,7 @@ namespace {
                 return PathType::Invalid;
             }
         } break;
+
         case PathType::Invalid: {
             std::cout << "Unspecified conversion mode. Use auconv --help" << '\n';
             std::quick_exit(1);
@@ -89,20 +93,15 @@ namespace {
         ParsedArgs parsed_args { .path = path, .mode = PathType::Invalid };
 
         std::string_view mode { args[1] };
-        // TODO(MATT): Don't dispatch work from here; instead, parse and handle elsewhere
+
         if (mode == FLAG_MODE_FILE) {
-            validatePath(path, PathType::File);
-            parsed_args.mode = PathType::File;
+            parsed_args.mode = validatePath(path, PathType::File);
         } else if (mode == FLAG_MODE_DIRECTORY) {
-            validatePath(path, PathType::Directory);
-            parsed_args.mode = PathType::Directory;
+            parsed_args.mode = validatePath(path, PathType::Directory);
         } else if (mode == FLAG_MODE_DIRECTORY_TREE) {
-            validatePath(path, PathType::DirectoryTree);
-            parsed_args.mode = PathType::DirectoryTree;
+            parsed_args.mode = validatePath(path, PathType::DirectoryTree);
         } else {
             parsed_args.mode = PathType::Invalid;
-            std::cout << "Unspecified conversion mode. Use auconv --help" << '\n'; // TODO(MATT): gotta go!
-            std::quick_exit(1);
         }
 
         // TODO(MATT): Parse args for input and output types
