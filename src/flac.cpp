@@ -19,21 +19,39 @@ using Path = std::filesystem::path;
 
 namespace {
 
+    void convertDirEntryToFlac(std::filesystem::directory_entry const& dir_entry)
+    {
+        if (dir_entry.is_regular_file()) {
+            if (dir_entry.path().extension() == ".wav") {
+                std::cout << "Converting wav file: " << dir_entry.path().filename() << '\n';
+
+                std::string outputFile = dir_entry.path().parent_path();
+                outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
+
+                convertWavToFlacFile(dir_entry.path(), outputFile, FORMAT_FLAC_PCM_16);
+            } else {
+                std::cout << "Skipping file: " << dir_entry.path().filename() << '\n';
+            }
+        } else {
+            std::cout << "Directory: " << dir_entry << '\n';
+        }
+    }
+
     void doBufferReadWrite(SndfileHandle& in, SndfileHandle& out)
     { // Initialize conversion buffer
         std::array<short, BUFFER_SIZE> buffer {};
 
         // Read through file to convert from input format to output format
         // and write to output file
-        sf_count_t read = 1;
-        while (read != 0) {
-            read = in.read(buffer.data(), buffer.size());
+        while (true) {
+            auto read = in.read(buffer.data(), buffer.size());
 
             // No more bytes to be read, so we're done
             if (read == 0) {
                 return;
             }
 
+            // Minimal buffer safety check
             if (static_cast<long>(buffer.size()) < read) {
                 std::cout << "Read too many bytes, bailing out!\n";
                 std::quick_exit(1);
@@ -42,6 +60,7 @@ namespace {
             out.write(buffer.data(), read);
         }
     }
+
 }
 
 void convertWavToFlacFile(Path const& input, Path const& output, int format)
@@ -66,19 +85,10 @@ void convertWavToFlacFile(Path const& input, Path const& output, int format)
 
     // Exit if an error occurred
     if (out_handle.error() != 0) {
-        std::cout << "\tCould not open output file: " << out_handle.strError() << '\n';
-        std::cout << "\tCheck against specified format (1 = pass): "
-                  << out_handle.formatCheck(
-                         format,
-                         in_handle.channels(),
-                         in_handle.samplerate())
-                  << '\n';
+        printOutputFileError(in_handle, out_handle, format);
         return;
-    } else { // similar to PrintFileInfo()
-        std::cout << "\tOutput file: " << output << '\n';
-        std::cout << "\t\tFormat: 0x" << std::hex << out_handle.format() << '\n';
-        std::cout << "\t\tSample rate: " << std::dec << out_handle.samplerate() << '\n';
-        std::cout << "\t\tChannels: " << out_handle.channels() << '\n';
+    } else {
+        printFileInfo(out_handle, output);
     }
 
     doBufferReadWrite(in_handle, out_handle);
@@ -89,36 +99,14 @@ void convertWavToFlacFile(Path const& input, Path const& output, int format)
 void convertWavToFlacInDir(Path const& path)
 {
     for (auto const& dir_entry : std::filesystem::directory_iterator(path)) {
-        if (dir_entry.is_regular_file()) {
-            if (dir_entry.path().extension() == ".wav") {
-                std::cout << "Converting wav file: " << dir_entry.path().filename() << '\n';
-
-                std::string outputFile = dir_entry.path().parent_path();
-                outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
-
-                convertWavToFlacFile(dir_entry.path(), outputFile, FORMAT_FLAC_PCM_16);
-            }
-        } else {
-            std::cout << "Directory: " << dir_entry << '\n';
-        }
+        convertDirEntryToFlac(dir_entry);
     }
 }
 
 void convertWavToFlacInDirTree(Path const& path)
 {
     for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(path)) {
-        if (dir_entry.is_regular_file()) {
-            if (dir_entry.path().extension() == ".wav") {
-                std::cout << "Converting wav file: " << dir_entry.path().filename() << '\n';
-
-                std::string outputFile = dir_entry.path().parent_path();
-                outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
-
-                convertWavToFlacFile(dir_entry.path(), outputFile, FORMAT_FLAC_PCM_16);
-            }
-        } else {
-            std::cout << "Directory: " << dir_entry << '\n';
-        }
+        convertDirEntryToFlac(dir_entry);
     }
 }
 
