@@ -15,8 +15,6 @@ namespace auconv {
 
 constexpr auto FORMAT_FLAC_PCM_16 = SF_FORMAT_FLAC | SF_FORMAT_PCM_16;
 
-using Path = std::filesystem::path;
-
 namespace {
 
     void convertDirEntryToFlac(std::filesystem::directory_entry const& dir_entry)

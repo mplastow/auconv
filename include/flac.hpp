@@ -3,11 +3,9 @@
 #ifndef AUCONV_FLAC_HPP
 #define AUCONV_FLAC_HPP
 
-#include <filesystem>
+#include <defines.hpp>
 
 namespace auconv {
-
-using Path = std::filesystem::path;
 
 void convertWavToFlacFile(Path const& input, Path const& output, int out_format);
 

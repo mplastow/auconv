@@ -5,6 +5,9 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <filesystem>
+#include <string>
+#include <vector>
 
 namespace auconv {
 
@@ -16,6 +19,10 @@ constexpr size_t PCM_BUFFER_SIZE = BUFFER_SIZE * 2;
 constexpr int_fast32_t HZ_44100 = 44100;
 constexpr int_fast32_t BITRATE_320 = 320;
 constexpr int_fast32_t MP3_COMP_RATIO_DEFAULT = 11;
+
+// Commonly used type aliases
+using ArgVec = std::vector<std::string>;
+using Path = std::filesystem::path;
 
 } // namespace auconv
 

@@ -3,14 +3,11 @@
 #ifndef AUCONV_FILES_HPP
 #define AUCONV_FILES_HPP
 
-#include <filesystem>
-
-// #include <sndfile.h>
 #include <sndfile.hh>
 
-namespace auconv {
+#include <defines.hpp>
 
-using Path = std::filesystem::path;
+namespace auconv {
 
 void printFileInfo(Path const& input_file);
 void printFileInfo(SndfileHandle const& handle, Path const& path);

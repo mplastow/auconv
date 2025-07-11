@@ -6,11 +6,10 @@
 #include <iostream>
 
 #include <cli.hpp>
+#include <defines.hpp>
 #include <flac.hpp>
 
 namespace auconv {
-
-using Path = std::filesystem::path;
 
 namespace {
 

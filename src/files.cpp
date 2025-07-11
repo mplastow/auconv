@@ -2,9 +2,11 @@
 
 #include <files.hpp>
 
+#include <iostream>
+
 #include <sndfile.hh>
 
-#include <iostream>
+#include <defines.hpp>
 
 namespace auconv {
 

@@ -3,18 +3,14 @@
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
-#include <string>
 #include <utility>
-#include <vector>
 
 #include <cli.hpp>
+#include <defines.hpp>
 #include <flac.hpp>
 #include <snd.hpp>
 
 namespace auconv {
-
-using ArgVec = std::vector<std::string>;
-using Path = std::filesystem::path;
 
 namespace {
 

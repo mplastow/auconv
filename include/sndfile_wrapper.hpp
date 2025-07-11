@@ -8,6 +8,8 @@
 
 #include <sndfile.hh>
 
+#include <defines.hpp>
+
 namespace auconv {
 
 class SndfileHandleHandle {

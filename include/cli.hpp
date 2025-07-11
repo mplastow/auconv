@@ -3,9 +3,10 @@
 #ifndef AUCONV_CLI_HPP
 #define AUCONV_CLI_HPP
 
-#include <filesystem>
 #include <string>
 #include <vector>
+
+#include <defines.hpp>
 
 namespace auconv {
 
@@ -29,6 +30,7 @@ enum struct PathType : int_fast8_t {
 
 // Specifies the file format that should be converted
 enum struct InFormat : int_fast8_t {
+    null,
     all, // convert all decodable audio files to the output format
     wav,
     flac,
@@ -38,6 +40,7 @@ enum struct InFormat : int_fast8_t {
 
 // Specifies the output file format for all converted files
 enum struct OutFormat : int_fast8_t {
+    null,
     wav,
     flac,
     mp3,
@@ -45,7 +48,7 @@ enum struct OutFormat : int_fast8_t {
 };
 
 struct ParsedArgs {
-    std::filesystem::path path; // conversion target path
+    Path path; // conversion target path
     PathType mode = PathType::File;
     InFormat in_format = InFormat::all;
     OutFormat out_Format = OutFormat::flac;

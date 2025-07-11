@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <iostream>
 
+#include <defines.hpp>
+
 namespace auconv {
 
 lame_global_flags* initLameWithFlags()
@@ -32,7 +34,7 @@ lame_global_flags* initLameWithFlags()
     return gfp;
 }
 
-void convertWavToMp3(std::filesystem::path const& inputFile, std::filesystem::path const& outputFile)
+void convertWavToMp3(Path const& inputFile, Path const& outputFile)
 {
     // mp3 conversion with libmp3lame
     // See https://stackoverflow.com/a/2496831/22896065
