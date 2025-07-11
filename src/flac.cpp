@@ -2,6 +2,7 @@
 
 #include <flac.hpp>
 
+#include <array>
 #include <filesystem>
 #include <iostream>
 
@@ -12,66 +13,77 @@
 
 namespace auconv {
 
+constexpr auto FORMAT_FLAC_PCM_16 = SF_FORMAT_FLAC | SF_FORMAT_PCM_16;
+
 using Path = std::filesystem::path;
+
+namespace {
+
+    void doBufferReadWrite(SndfileHandle& in, SndfileHandle& out)
+    { // Initialize conversion buffer
+        std::array<short, BUFFER_SIZE> buffer {};
+
+        // Read through file to convert from input format to output format
+        // and write to output file
+        sf_count_t read = 1;
+        while (read != 0) {
+            read = in.read(buffer.data(), buffer.size());
+
+            // No more bytes to be read, so we're done
+            if (read == 0) {
+                return;
+            }
+
+            if (static_cast<long>(buffer.size()) < read) {
+                std::cout << "Read too many bytes, bailing out!\n";
+                std::quick_exit(1);
+            }
+
+            out.write(buffer.data(), read);
+        }
+    }
+}
 
 void convertWavToFlacFile(Path const& input, Path const& output, int format)
 {
     // Get handle to input file
-    SndfileHandle inputFileHandle = SndfileHandle(input);
-    if (inputFileHandle.error()) {
-        std::cout << "Could not open input file: " << inputFileHandle.strError() << '\n';
+    SndfileHandle in_handle { input };
+    if (in_handle.error() != 0) {
+        std::cout << "Could not open input file: " << in_handle.strError() << '\n';
         return;
     } else {
         printFileInfo(input);
     }
 
     // Get handle to output file
-    SndfileHandle outputFileHandle = SndfileHandle(
+    SndfileHandle out_handle {
         output,
         SFM_WRITE,
         format,
-        inputFileHandle.channels(),
-        inputFileHandle.samplerate());
+        in_handle.channels(),
+        in_handle.samplerate()
+    };
+
     // Exit if an error occurred
-    if (outputFileHandle.error()) {
-        std::cout << "\tCould not open output file: " << outputFileHandle.strError() << '\n';
-        std::cout << "\tCheck against specified format (1 = pass): " << outputFileHandle.formatCheck(format, inputFileHandle.channels(), inputFileHandle.samplerate()) << '\n';
+    if (out_handle.error() != 0) {
+        std::cout << "\tCould not open output file: " << out_handle.strError() << '\n';
+        std::cout << "\tCheck against specified format (1 = pass): "
+                  << out_handle.formatCheck(
+                         format,
+                         in_handle.channels(),
+                         in_handle.samplerate())
+                  << '\n';
         return;
     } else { // similar to PrintFileInfo()
         std::cout << "\tOutput file: " << output << '\n';
-        std::cout << "\t\tFormat: 0x" << std::hex << outputFileHandle.format() << '\n';
-        std::cout << "\t\tSample rate: " << std::dec << outputFileHandle.samplerate() << '\n';
-        std::cout << "\t\tChannels: " << outputFileHandle.channels() << '\n';
+        std::cout << "\t\tFormat: 0x" << std::hex << out_handle.format() << '\n';
+        std::cout << "\t\tSample rate: " << std::dec << out_handle.samplerate() << '\n';
+        std::cout << "\t\tChannels: " << out_handle.channels() << '\n';
     }
 
-    // Initialize conversion buffer
-    // TODO(MATT): use std::array instead
-    static short buffer[BUFFER_SIZE];
-    // std::cout << "Read/write buffer size: " << BUFFER_SIZE << std::endl;
-
-    // Initialize read and write objects
-    sf_count_t read = 1;
-    sf_count_t write = 1;
-
-    // Read through file to convert from input format to output format
-    // and write to output file
-    while (read != 0) {
-        read = inputFileHandle.read(buffer, BUFFER_SIZE);
-        // std::cout << "Read: " << read << std::endl;
-
-        if (read != 0) { // write to out if bytes were read
-            write = outputFileHandle.write(buffer, read);
-            // std::cout << "Write: " << write << std::endl;
-        }
-    }
+    doBufferReadWrite(in_handle, out_handle);
 
     std::cout << "\tFinished file conversion." << '\n';
-    // std::cout << " Reached end of input file. Last read: " << read << std::endl;
-    if (write == 0) {
-        //     std::cout << "Warning: Last write was 0 bytes! Last write: " << write << "\n" << std::endl;
-    } else {
-        //     std::cout << "Last write: " << write << "\n" << std::endl;
-    }
 }
 
 void convertWavToFlacInDir(Path const& path)
@@ -84,10 +96,7 @@ void convertWavToFlacInDir(Path const& path)
                 std::string outputFile = dir_entry.path().parent_path();
                 outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
 
-                convertWavToFlacFile(
-                    dir_entry.path(),
-                    outputFile,
-                    SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
+                convertWavToFlacFile(dir_entry.path(), outputFile, FORMAT_FLAC_PCM_16);
             }
         } else {
             std::cout << "Directory: " << dir_entry << '\n';
@@ -105,10 +114,7 @@ void convertWavToFlacInDirTree(Path const& path)
                 std::string outputFile = dir_entry.path().parent_path();
                 outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
 
-                convertWavToFlacFile(
-                    dir_entry.path(),
-                    outputFile,
-                    SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
+                convertWavToFlacFile(dir_entry.path(), outputFile, FORMAT_FLAC_PCM_16);
             }
         } else {
             std::cout << "Directory: " << dir_entry << '\n';
