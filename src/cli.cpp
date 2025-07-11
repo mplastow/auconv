@@ -16,7 +16,7 @@ namespace auconv {
 namespace {
 
     // Validate that we got a valid path of the type we want, given the mode flag
-    // Arg name intuition: Here's the `path` we `got`, this is the path we `want`
+    // Arg name intuition: Here's the `path` we `got`, this is the type we `want`
     PathType validatePath(Path const& path, PathType want)
     {
         std::string_view mode_str {};
@@ -74,7 +74,7 @@ namespace {
         std::quick_exit(1);
     }
 
-    ParsedArgs parseArgs(ArgVec const& args)
+    ParsedArgs parseArgs(ArgArray const& args)
     {
         Path path { args[2] };
 
@@ -83,14 +83,12 @@ namespace {
             path = std::filesystem::current_path();
         }
         if (!std::filesystem::exists(path)) {
-            std::cout << "The path you provided is not valid." << '\n';
+            std::cout << "The provided path is not valid." << '\n';
             std::quick_exit(1);
         }
 
         ParsedArgs parsed_args { .path = path, .mode = PathType::Invalid };
-
         std::string_view mode { args[1] };
-
         if (mode == FLAG_MODE_FILE) {
             parsed_args.mode = validatePath(path, PathType::File);
         } else if (mode == FLAG_MODE_DIRECTORY) {
@@ -106,7 +104,7 @@ namespace {
         return parsed_args;
     }
 
-    void printArgs(ArgVec const& args)
+    void printArgs(ArgArray const& args)
     {
         std::cout << "CLI ARGS: \n";
         size_t argc { 0 };
@@ -114,6 +112,12 @@ namespace {
             std::cout << "args[" << argc++ << "]: \" " << arg << " \"\n";
         }
         std::cout << "END OF CLI ARGS\n\n";
+    }
+
+    void printErrorArgNumber()
+    {
+        std::cout << "Incorrect number of arguments. Use auconv --help" << '\n';
+        std::quick_exit(1);
     }
 
     void printHelp()
@@ -130,15 +134,9 @@ namespace {
         std::quick_exit(0);
     }
 
-    void wrongArgNumber()
-    {
-        std::cout << "Incorrect number of arguments. Use auconv --help" << '\n';
-        std::quick_exit(1);
-    }
-
 } // namespace
 
-ParsedArgs handleCLIArguments(ArgVec const& args)
+ParsedArgs handleCLIArguments(ArgArray const& args)
 {
     printArgs(args); // TODO(MATT): get rid of this eventually
 
@@ -147,7 +145,7 @@ ParsedArgs handleCLIArguments(ArgVec const& args)
         if (args.at(1) == "--help") {
             printHelp();
         } else {
-            wrongArgNumber();
+            printErrorArgNumber();
         }
     } break;
     case 3: {
@@ -155,7 +153,7 @@ ParsedArgs handleCLIArguments(ArgVec const& args)
     } break;
 
     default: {
-        wrongArgNumber();
+        printErrorArgNumber();
     }
     }
 

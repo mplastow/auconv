@@ -9,7 +9,7 @@
 
 auto main(int argc, char* argv[]) -> int
 {
-    auconv::ArgVec arg_vec {};
+    auconv::ArgArray arg_vec {};
     for (int i { 0 }; i < argc; ++i) {
         arg_vec.emplace_back(argv[i]);
     }

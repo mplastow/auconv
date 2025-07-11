@@ -34,6 +34,7 @@ lame_global_flags* initLameWithFlags()
     return gfp;
 }
 
+// TODO(MATT): Replace with libsndfile if possible
 void convertWavToMp3(Path const& inputFile, Path const& outputFile)
 {
     // mp3 conversion with libmp3lame
@@ -66,12 +67,16 @@ void convertWavToMp3(Path const& inputFile, Path const& outputFile)
         }
         fwrite(mp3_buffer, write, 1, mp3_file_ptr);
     } while (read != 0);
-    std::cout << "Finished writing mp3 file." << std::endl;
+    std::cout << "Finished writing mp3 file." << '\n';
 
     // Close output file
     fclose(mp3_file_ptr);
     // Close LAME
     lame_close(gfp);
+}
+
+void convertWavToMp3(Path const& path)
+{
 }
 
 } // namespace auconv

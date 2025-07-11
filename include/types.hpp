@@ -12,7 +12,7 @@
 
 namespace auconv {
 // Type aliases
-using ArgVec = std::vector<std::string>;
+using ArgArray = std::vector<std::string>;
 using Path = std::filesystem::path;
 
 // Specifies the type of path; implicitly specifies what to convert
@@ -25,7 +25,7 @@ enum struct PathType : int_fast8_t {
     DirectoryTree, // all files in a directory tree, recursively
 };
 
-// Specifies the file format that should be converted
+// Specifies an input file format
 enum struct InFormat : int_fast8_t {
     null,
     all, // convert all decodable audio files to the output format
@@ -35,7 +35,7 @@ enum struct InFormat : int_fast8_t {
     // ...
 };
 
-// Specifies the output file format for all converted files
+// Specifies an output file format
 enum struct OutFormat : int_fast8_t {
     null,
     wav,
