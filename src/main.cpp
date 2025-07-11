@@ -7,10 +7,6 @@
 #include <cli.hpp>
 #include <snd.hpp>
 
-namespace { // provides internal linkage for `main.cpp`
-
-} // namespace
-
 auto main(int argc, char* argv[]) -> int
 {
     using ArgVec = std::vector<std::string>;

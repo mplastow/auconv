@@ -45,6 +45,7 @@ void convertWavToFlacFile(Path const& input, Path const& output, int format)
     }
 
     // Initialize conversion buffer
+    // TODO(MATT): use std::array instead
     static short buffer[BUFFER_SIZE];
     // std::cout << "Read/write buffer size: " << BUFFER_SIZE << std::endl;
 

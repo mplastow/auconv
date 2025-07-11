@@ -7,7 +7,7 @@
 
 namespace lib {
 
-i32 factorial(i32 n)
+int factorial(int n)
 {
     if (n == 0) {
         return 1;

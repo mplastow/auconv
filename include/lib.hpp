@@ -6,11 +6,10 @@
 #define LIB_HPP
 
 // Dependencies
-#include <type_aliases.hpp>
 
 namespace lib {
 
-i32 factorial(i32 n);
+int factorial(int n);
 
 }
 
