@@ -41,8 +41,8 @@ namespace {
         std::array<short, BUFFER_SIZE> buffer {};
 
         // Read through file to convert from input format to output format
-        // and write to output file
         while (true) {
+            // Read a chunk of data into the buffer
             auto read = in.read(buffer.data(), buffer.size());
 
             // No more bytes to be read, so we're done
@@ -56,6 +56,7 @@ namespace {
                 std::quick_exit(1);
             }
 
+            // Write the chunk from buffer to file
             out.write(buffer.data(), read);
         }
     }
@@ -82,29 +83,33 @@ void convertWavToFlacFile(Path const& input, Path const& output, int format)
         in_handle.samplerate()
     };
 
-    // Exit if an error occurred
+    // Bail out if an error occurred
     if (out_handle.error() != 0) {
-        printOutputFileError(in_handle, out_handle, format);
+        printErrorOutputFile(in_handle, out_handle, format);
         return;
-    } else {
-        printFileInfo(out_handle, output);
     }
+
+    printFileInfo(out_handle, output);
 
     doBufferReadWrite(in_handle, out_handle);
 
     std::cout << "\tFinished file conversion." << '\n';
 }
 
+// TODO(MATT): These two functions are good candidates for a very basic Strategy pattern
+
 void convertWavToFlacInDir(Path const& path)
 {
-    for (auto const& dir_entry : std::filesystem::directory_iterator(path)) {
+    using namespace std::filesystem;
+    for (directory_entry const& dir_entry : directory_iterator(path)) {
         convertDirEntryToFlac(dir_entry);
     }
 }
 
 void convertWavToFlacInDirTree(Path const& path)
 {
-    for (auto const& dir_entry : std::filesystem::recursive_directory_iterator(path)) {
+    using namespace std::filesystem;
+    for (directory_entry const& dir_entry : recursive_directory_iterator(path)) {
         convertDirEntryToFlac(dir_entry);
     }
 }

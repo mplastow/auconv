@@ -23,6 +23,7 @@ namespace {
         auto got { PathType::Invalid };
         switch (want) {
 
+            // TODO(MATT): How much of this code is actually redundant?
         case PathType::File: {
             if (std::filesystem::is_regular_file(path)) {
                 return PathType::File;
@@ -79,15 +80,12 @@ namespace {
         Path path { args[2] };
 
         // TODO(MATT): Test whether this is a redundant operation
-        if (path == ".") {
-            path = std::filesystem::current_path();
-        }
         if (!std::filesystem::exists(path)) {
             std::cout << "The provided path is not valid." << '\n';
             std::quick_exit(1);
         }
 
-        ParsedArgs parsed_args { .path = path, .mode = PathType::Invalid };
+        ParsedArgs parsed_args { .path { path }, .mode {} };
         std::string_view mode { args[1] };
         if (mode == FLAG_MODE_FILE) {
             parsed_args.mode = validatePath(path, PathType::File);

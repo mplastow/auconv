@@ -12,7 +12,7 @@ namespace auconv {
 
 void printFileInfo(Path const& input_file);
 void printFileInfo(SndfileHandle const& handle, Path const& path);
-void printOutputFileError(SndfileHandle const& in_handle, SndfileHandle const& out_handle, int format);
+void printErrorOutputFile(SndfileHandle const& in_handle, SndfileHandle const& out_handle, int format);
 
 } // namespace auconv
 

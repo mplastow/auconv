@@ -42,7 +42,7 @@ void printFileInfo(SndfileHandle const& handle, Path const& path)
     }
 }
 
-void printOutputFileError(SndfileHandle const& in_handle, SndfileHandle const& out_handle, int format)
+void printErrorOutputFile(SndfileHandle const& in_handle, SndfileHandle const& out_handle, int format)
 {
     std::cout << "\tCould not open output file: " << out_handle.strError() << '\n';
     std::cout << "\tCheck against specified format (1 = pass): "
