@@ -28,7 +28,7 @@ namespace {
                 std::string outputFile = dir_entry.path().parent_path();
                 outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
 
-                convertWavToFlacFile(dir_entry.path(), outputFile, FORMAT_FLAC_PCM_16);
+                convertToFlacFile(dir_entry.path(), outputFile, FORMAT_FLAC_PCM_16);
             } else {
                 std::cout << "Skipping file: " << dir_entry.path().filename() << '\n';
             }
@@ -64,7 +64,7 @@ namespace {
 
 } // namespace
 
-void convertWavToFlacFile(Path const& input, Path const& output, int format)
+void convertToFlacFile(const Path& input, const Path& output, int format)
 {
     // Get handle to input file
     SndfileHandle in_handle {input};
@@ -97,7 +97,7 @@ void convertWavToFlacFile(Path const& input, Path const& output, int format)
 }
 
 /// TODO: (MATT)  These two functions are good candidates for a very basic Strategy pattern
-void convertWavToFlacInDirs(Path const& path, PathType path_type)
+void convertWavFilesToFlac(const Path& path, PathType path_type)
 {
     using namespace std::filesystem;
 
@@ -119,22 +119,6 @@ void convertWavToFlacInDirs(Path const& path, PathType path_type)
         std::cout << "Bad file got here somehow\n";
         std::quick_exit(1);
     } break;
-    }
-}
-
-void convertWavToFlacInDir(Path const& path)
-{
-    using namespace std::filesystem;
-    for (directory_entry const& dir_entry : directory_iterator(path)) {
-        convertDirEntryToFlac(dir_entry);
-    }
-}
-
-void convertWavToFlacInDirTree(Path const& path)
-{
-    using namespace std::filesystem;
-    for (directory_entry const& dir_entry : recursive_directory_iterator(path)) {
-        convertDirEntryToFlac(dir_entry);
     }
 }
 

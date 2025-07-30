@@ -11,7 +11,7 @@
 
 namespace auconv {
 
-void printFileInfo(Path const& input_file)
+void printFileInfo(const Path& input_file)
 {
     // Print file properties with libsndfile
     SndfileHandle input_file_handle = SndfileHandle(input_file);
@@ -27,7 +27,7 @@ void printFileInfo(Path const& input_file)
     }
 }
 
-void printFileInfo(SndfileHandle const& handle, Path const& path)
+void printFileInfo(const SndfileHandle& handle, const Path& path)
 {
     // Print file properties with libsndfile
     if (handle.error() != 0) {
@@ -42,7 +42,7 @@ void printFileInfo(SndfileHandle const& handle, Path const& path)
     }
 }
 
-void printErrorOutputFile(SndfileHandle const& in_handle, SndfileHandle const& out_handle, int format)
+void printErrorOutputFile(const SndfileHandle& in_handle, const SndfileHandle& out_handle, int format)
 {
     std::cout << "\tCould not open output file: " << out_handle.strError() << '\n';
     std::cout << "\tCheck against specified format (1 = pass): "

@@ -15,7 +15,7 @@ namespace auconv {
 namespace {
 
     /// TODO: (MATT)  multiformat
-    void convertFile(Path const& path)
+    void convertFile(const Path& path)
     {
         if (path.extension() == ".wav") {
             std::cout << "Converting wav file: " << path.filename() << '\n';
@@ -24,13 +24,13 @@ namespace {
             output.append("/").append(path.stem()).append(".flac");
 
             /// TODO: (MATT)  multiformat, don't hardcode this!
-            auconv::convertWavToFlacFile(path, Path {output}, SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
+            auconv::convertToFlacFile(path, Path {output}, SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
         } else {
             std::cout << "Skipping due to file extension: " << path.filename() << '\n';
         }
     }
 
-    void convertFile(Path const& path, InFormat in_format, OutFormat out_format)
+    void convertFile(const Path& path, InFormat in_format, OutFormat out_format)
     {
         if (in_format.fmt_ == out_format.fmt_) {
             std::cout << "Skipping " << path.filename() << " because input format matches output format.\n";
@@ -44,7 +44,7 @@ namespace {
             output.append("/").append(path.stem()).append(".flac");
 
             /// TODO: (MATT)  multiformat, don't hardcode this!
-            auconv::convertWavToFlacFile(path, Path {output}, SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
+            auconv::convertToFlacFile(path, Path {output}, SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
         } break;
         default: {
             std::cout << "Skipping due to file extension: " << path.filename() << '\n';
@@ -52,12 +52,22 @@ namespace {
         }
     }
 
+    void convertFiles(const Path& path, PathType path_type)
+    {
+        convertWavFilesToFlac(path, path_type);
+    }
+
+    void convertFilesNew(const Path& path, PathType path_type)
+    {
+        convertWavFilesToFlac(path, path_type);
+    }
+
 } // namespace
 
 void handleParsedArgs(ParsedArgs const& args)
 {
     /// TODO: (MATT) multiformat
-    convertWavToFlacInDirs(args.path, args.mode);
+    convertFiles(args.path, args.mode);
 }
 
 } // namespace auconv

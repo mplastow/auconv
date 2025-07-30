@@ -17,8 +17,9 @@ namespace {
 
     // Validate that we got a valid path of the type we want, given the mode flag
     // Arg name intuition: Here's the `path` we `got`, this is the type we `want`
-    PathType validatePath(Path const& path, PathType want)
+    PathType validatePath(const Path& path, PathType want)
     {
+        std::cout << "We gonna do validate this path.\n";
         std::string_view mode_str {};
         auto             got {PathType::Invalid};
         switch (want) {
@@ -26,6 +27,7 @@ namespace {
             /// TODO: (MATT)  How much of this code is actually redundant?
         case PathType::File: {
             if (std::filesystem::is_regular_file(path)) {
+                std::cout << "We got us a file.\n";
                 return PathType::File;
             } else if (std::filesystem::is_directory(path)) {
                 got      = PathType::Directory;
@@ -37,6 +39,7 @@ namespace {
 
         case PathType::Directory: {
             if (std::filesystem::is_directory(path)) {
+                std::cout << "We got us a dir.\n";
                 return PathType::Directory;
             } else if (std::filesystem::is_regular_file(path)) {
                 got      = PathType::File;
@@ -48,6 +51,7 @@ namespace {
 
         case PathType::DirectoryTree: {
             if (std::filesystem::is_directory(path)) {
+                std::cout << "We got us a dir tree.\n";
                 return PathType::DirectoryTree;
             } else if (std::filesystem::is_regular_file(path)) {
                 got      = PathType::File;
@@ -75,6 +79,22 @@ namespace {
         std::quick_exit(1);
     }
 
+    PathType parseMode(const Path& path, std::string_view mode)
+    {
+        PathType path_type {PathType::Invalid};
+        if (mode == FLAG_MODE_FILE) {
+            path_type = validatePath(path, PathType::File);
+        } else if (mode == FLAG_MODE_DIRECTORY) {
+            path_type = validatePath(path, PathType::Directory);
+        } else if (mode == FLAG_MODE_DIRECTORY_TREE) {
+            path_type = validatePath(path, PathType::DirectoryTree);
+        } else {
+            std::cout << "Mode is not valid. Use auconv --help\n";
+            std::quick_exit(1);
+        }
+        return path_type;
+    }
+
     ParsedArgs parseArgs(ArgArray const& args)
     {
         Path path {args[2]};
@@ -87,17 +107,8 @@ namespace {
 
         ParsedArgs parsed_args {.path {path}, .mode {}};
 
-        /// TODO: (MATT) This if-else tree is somewhat redundant with validatePath(), so combine them
         std::string_view mode {args[1]};
-        if (mode == FLAG_MODE_FILE) {
-            parsed_args.mode = validatePath(path, PathType::File);
-        } else if (mode == FLAG_MODE_DIRECTORY) {
-            parsed_args.mode = validatePath(path, PathType::Directory);
-        } else if (mode == FLAG_MODE_DIRECTORY_TREE) {
-            parsed_args.mode = validatePath(path, PathType::DirectoryTree);
-        } else {
-            parsed_args.mode = PathType::Invalid;
-        }
+        parsed_args.mode = parseMode(path, mode);
 
         /// TODO: (MATT)  Parse args for input and output types
 

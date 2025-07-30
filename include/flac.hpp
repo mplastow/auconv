@@ -8,13 +8,13 @@
 
 namespace auconv {
 
-void convertWavToFlacFile(Path const& input, Path const& output, int out_format);
+void convertToFlacFile(const Path& input, const Path& output, int out_format);
 
-void convertWavToFlacInDirs(Path const& path, PathType path_type);
+void convertWavFilesToFlac(const Path& path, PathType path_type);
 
-void convertWavToFlacInDir(Path const& path);
+void convertWavToFlacInDir(const Path& path);
 
-void convertWavToFlacInDirTree(Path const& path);
+void convertWavToFlacInDirTree(const Path& path);
 
 } // namespace auconv
 

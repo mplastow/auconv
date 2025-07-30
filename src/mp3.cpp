@@ -35,7 +35,7 @@ lame_global_flags* initLameWithFlags()
 }
 
 /// TODO: (MATT)  Replace with libsndfile if possible
-void convertWavToMp3(Path const& inputFile, Path const& outputFile)
+void convertWavToMp3(const Path& inputFile, const Path& outputFile)
 {
     // mp3 conversion with libmp3lame
     // See https://stackoverflow.com/a/2496831/22896065
@@ -75,7 +75,7 @@ void convertWavToMp3(Path const& inputFile, Path const& outputFile)
     lame_close(gfp);
 }
 
-void convertWavToMp3(Path const& path)
+void convertWavToMp3(const Path& path)
 {
 }
 
