@@ -1,7 +1,30 @@
 BasedOnStyle: WebKit
 
-SortIncludes: false
-
 AlignTrailingComments: true
-
 ColumnLimit: 0
+IndentWidth: 4
+
+---
+Language: Cpp
+
+AlignAfterOpenBracket: DontAlign
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AlignEscapedNewlines: Right
+AlignOperands: true
+AlignTrailingComments: true
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLambdasOnASingleLine: Inline
+AllowShortFunctionsOnASingleLine: Inline
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  BeforeLambdaBody: false
+  SplitEmptyFunction: false
+BreakConstructorInitializers: BeforeComma
+Cpp11BracedListStyle: true
+FixNamespaceComments: true
+PackConstructorInitializers: Never
+ShortNamespaceLines: 3
+SortIncludes: false
+WrapNamespaceBodyWithEmptyLines: Always # clangd-20+

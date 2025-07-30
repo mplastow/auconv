@@ -69,69 +69,75 @@ pub fn build(b: *std.Build) void {
         "-std=c++23", // C++ 23
         "-g", // Include debug information in binary
         "-ggdb3", // Maximizes debug information
-        "-O2", // Optimization level: Og = debug, Os = size, O2 = good, O3 = maximum
+        "-Og", // Optimization level: Og = debug, Os = size, O2 = good, O3 = maximum
 
-        // Warning flags
+        // // Warning flags
         "-Wall", // Reasonable default warnings
         "-Wextra", // More reasonable default warnings
         "-Wpedantic", // Enforces ISO C and C++, ensures portability
-        // "-Weverything",// EVERY SINGLE WARNING, introduces conflicts, do not use
-        "-Wcast-qual", // Warns when type qualifiers are cast away
+        // "-Weverything", // EVERY SINGLE WARNING. Introduces conflicts! Do not use!
+        "-Walloca", // Warns on use of `alloca`
         "-Wcast-align", // Warns when casts increase required alignment
-        "-Wconversion", // Warns on implicit conversion that may result in data loss
+        "-Wcast-qual", // Warns when type qualifiers are cast away
+        "-Wcomma", // Warns on possible misuse of the comma operator
+        "-Wconversion", // Warns on implicit conversions that may result in data loss
+        "-Wdouble-promotion", // Warns when implicit conversion increases floating-point precision
+        "-Wextra-semi", // Warns about redundant semicolons
         "-Wfloat-equal", // Warns when floating point types are compared for in/equality
-        "-Wmismatched-tags", // Warns against previous declarations
-        "-Wnon-virtual-dtor", // == "-Weffc++": Warns when class has virtual functions but non-virtual destructor
+        "-Wnon-virtual-dtor", // == "-Weffc++": Warns when a class has virtual functions but a non-virtual destructor
+        "-Wold-style-cast", // Warns on old C-style casts
+        "-Wpointer-arith", // Warns on pointer arithmetic that is invalid or introduces UB
+        "-Wrange-loop-analysis", // Warns when a range-based for loop creates an unnecessary copy
         "-Wshadow-all", // Warns when a declaration shadows anything else
-        "-Wstrict-prototypes", // Warns on f() rather than f(void) for C projects
         "-Wthread-safety", // Warns on potential race conditions across threads
-        "-Wvla", // Warns when using C99 variable-length arrays
-        "-Wsign-conversion", // Warns on sign conversion
         "-Wunsafe-buffer-usage", // Warns when a buffer operation is done on a raw pointer
-        "-Wunused", // Warns on unused variables, functions etc.
-        "-Wunused-parameter", // Warns on unused parameters
+        "-Wunreachable-code-aggressive", // Warns on code that will never be executed
         "-Wunused-template", // Warns on unused templates
+        "-Wvla", // Warns on use of C99 variable-length arrays
 
-        // Sanitizers / Hardeners
-        // "unsigned-integer-overflow" is an option for -fsanitize, but we should not be using unsigned integers except
-        //  in situations where overflowing is desirable or mandated by the language! So don't include it!
+        // // Rule of 0/3/5/6
+        "-Wdeprecated-copy", // Warns when user-declared copy ctor or operator= prevent implicit definition of the other one
+        "-Wdeprecated-copy-with-dtor", // Warns when user-declared dtor prevents implicit definition of copy ctor and operator=
+        "-Wdeprecated-implementations", // Warns when implementing deprecated or unavailable methods, classes, and categories
+
+        // // Deprecated language features
+        "-Wdeprecated", // Warns on use of deprecated C++ language features
+
+        // // Sanitizers / Hardeners
+        // NOTE: Do not use the -fsanitize option "unsigned-integer-overflow". We should not be using unsigned integers
+        //      except in situations where overflowing is desirable or mandated by the language!
         "-fsanitize=undefined,bounds,implicit-conversion,nullability", // UB Sanitizer
         "-fsanitize-trap=undefined,bounds,implicit-conversion,nullability", // UB Sanitizer handles UB by trapping
         "-fsafe-buffer-usage-suggestions", // "semi-automatically transform large bodies of code to follow the C++ Safe Buffers programming model"
         "-fno-omit-frame-pointer", // Must be set (along with -g) to get proper debug information in the binary. Can remove for release builds.
         "-D_LIBCPP_HARDENING_MODE=_LIBCPP_HARDENING_MODE_DEBUG", // libc++ hardening mode. Note: possibly? inferred by zig cc from -Ox and -fsanitize=undefined flags
         "-ftrivial-auto-var-init=pattern", // Overwrites uninitialized memory with a pattern
+        "-ftrapv", // Traps on signed integer overflow (to be consistent with UBSan). Set either this or "-fwrapv"
+        // "-fwrapv", // Treats signed integer overflow as two’s complement (wraps around). Set either this or "-ftrapv"
         "-pedantic-errors", // "Reject all forbidden compiler extensions." Also appears to always turn -Wpendantic warnings into errors.
 
-        // Dialect flags
+        // // Optimizations (exploit assumption that UB cannot happen in certain cases)
+        "-fstrict-aliasing", // Enables optimizations based on the assumption of strict aliasing
+        "-fstrict-enums", // Enables optimizations based on the strict definition of an enum’s value range
+        "-fstrict-overflow", // Enables optimizations based on strict signed overflow rules
+        "-fstrict-return", // Enables optimizations based on treating control flow paths that fall off the end of a non-void function as unreachable
+        "-fstrict-vtable-pointers", // Enables optimizations based on the strict rules for overwriting polymorphic C++ objects
+
+        // // Dialect flags
         // "-fno-exceptions", // Disables exception handling
         // "-fno-rtti", // Disables runtime type info (commented-out here because it may be incompatible with a UBSan feature)
 
-        // Useful flags
-        // "-ftrapv", // Traps on signed integer overflow (to be consistent with UBSan). Set either this or "-fwrapv"
-        // "-fwrapv", // Treats signed integer overflow as two’s complement (wraps around). Set either this or "-ftrapv"
-        "-fstrict-aliasing", // Enables optimizations based on the assumption of strict aliasing
-        "-fstrict-enums", // Enables optimizations based on the strict definition of an enum’s value range
+        // // Useful flags
         // "-ftime-trace", // Outputs a Chrome Tracing .json object containing a compiler performance report
-
-        // // Flags to DISABLE warnings -- for use with -Werror
-        // "-Wno-cast-qual", // Disables warning when a pointer is cast so as to remove a type qualifier
-        // "-Wno-conversion", // Disables warning on implicit conversion that may result in data loss
-        // "-Wno-float-equal", // Disables warning when floating-point values used in equality comparisons
-        // "-Wno-ignored-qualifiers", // Disables warning when return type of a function has a type qualifier
-        // "-Wno-non-virtual-dtor", // Disables warning when class has virtual functions but non-virtual destructor
-        // "-Wno-sign-compare", // Disables warning when a comparison between signed and unsigned values could produce an incorrect result
-        // "-Wno-sign-conversion", // Disables warning on implicit conversion between un/signed
-        // "-Wno-unused", // Disables warnings for unused variables, functions etc.
-        // "-Wno-unused-parameter", // Disables unused parameter warnings
-        // "-Wno-unused-template", // Disables unused template warnings
+        // "-fextend-variable-liveness" // clang 20+: preserves the liveness of variables so that they are visible in a debugger more often
 
         // // Converts warnings into errors -- turn off when needed
         // "-Werror",
-        // "-ferror-limit=0",
+        // "-ferror-limit=20",
 
-        // // Enable Tracy profiler
-        // "-DTRACY_ENABLE",
+        // // Flags to DISABLE warnings -- for use with -Werror
+        // "-Wno-unused", // Disables warnings for unused variables, functions etc.
+        // "-Wno-error=unused", // Disables warnings for unused variables, functions etc.
     };
 
     // Add a step called "ccjson" (Compile commands DataBase) for making compile_commands.json.

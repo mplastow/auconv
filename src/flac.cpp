@@ -1,20 +1,21 @@
 // flac.cpp - auconv
 
+#include <cstdlib>
 #include <flac.hpp>
 
 #include <array>
 #include <filesystem>
 #include <iostream>
 
+#include <sndfile.h>
 #include <sndfile.hh>
 
 #include <defines.hpp>
 #include <files.hpp>
+#include <snd.hpp>
 #include <types.hpp>
 
 namespace auconv {
-
-constexpr auto FORMAT_FLAC_PCM_16 = SF_FORMAT_FLAC | SF_FORMAT_PCM_16;
 
 namespace {
 
@@ -61,12 +62,12 @@ namespace {
         }
     }
 
-}
+} // namespace
 
 void convertWavToFlacFile(Path const& input, Path const& output, int format)
 {
     // Get handle to input file
-    SndfileHandle in_handle { input };
+    SndfileHandle in_handle {input};
     if (in_handle.error() != 0) {
         std::cout << "Could not open input file: " << in_handle.strError() << '\n';
         return;
@@ -80,8 +81,7 @@ void convertWavToFlacFile(Path const& input, Path const& output, int format)
         SFM_WRITE,
         format,
         in_handle.channels(),
-        in_handle.samplerate()
-    };
+        in_handle.samplerate()};
 
     // Bail out if an error occurred
     if (out_handle.error() != 0) {
@@ -96,7 +96,31 @@ void convertWavToFlacFile(Path const& input, Path const& output, int format)
     std::cout << "\tFinished file conversion." << '\n';
 }
 
-// TODO(MATT): These two functions are good candidates for a very basic Strategy pattern
+/// TODO: (MATT)  These two functions are good candidates for a very basic Strategy pattern
+void convertWavToFlacInDirs(Path const& path, PathType path_type)
+{
+    using namespace std::filesystem;
+
+    switch (path_type) {
+    case PathType::Directory: {
+        for (directory_entry const& dir_entry : directory_iterator(path)) {
+            convertDirEntryToFlac(dir_entry);
+        }
+    } break;
+    case PathType::DirectoryTree: {
+        for (directory_entry const& dir_entry : recursive_directory_iterator(path)) {
+            convertDirEntryToFlac(dir_entry);
+        }
+    } break;
+    case PathType::File: {
+        convertDirEntryToFlac(directory_entry(path));
+    } break;
+    default: {
+        std::cout << "Bad file got here somehow\n";
+        std::quick_exit(1);
+    } break;
+    }
+}
 
 void convertWavToFlacInDir(Path const& path)
 {

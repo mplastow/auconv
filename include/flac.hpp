@@ -10,6 +10,8 @@ namespace auconv {
 
 void convertWavToFlacFile(Path const& input, Path const& output, int out_format);
 
+void convertWavToFlacInDirs(Path const& path, PathType path_type);
+
 void convertWavToFlacInDir(Path const& path);
 
 void convertWavToFlacInDirTree(Path const& path);

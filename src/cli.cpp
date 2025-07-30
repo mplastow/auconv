@@ -20,15 +20,15 @@ namespace {
     PathType validatePath(Path const& path, PathType want)
     {
         std::string_view mode_str {};
-        auto got { PathType::Invalid };
+        auto             got {PathType::Invalid};
         switch (want) {
 
-            // TODO(MATT): How much of this code is actually redundant?
+            /// TODO: (MATT)  How much of this code is actually redundant?
         case PathType::File: {
             if (std::filesystem::is_regular_file(path)) {
                 return PathType::File;
             } else if (std::filesystem::is_directory(path)) {
-                got = PathType::Directory;
+                got      = PathType::Directory;
                 mode_str = FLAG_MODE_FILE_QUOTED;
             } else {
                 return PathType::Invalid;
@@ -39,7 +39,7 @@ namespace {
             if (std::filesystem::is_directory(path)) {
                 return PathType::Directory;
             } else if (std::filesystem::is_regular_file(path)) {
-                got = PathType::File;
+                got      = PathType::File;
                 mode_str = FLAG_MODE_DIRECTORY_QUOTED;
             } else {
                 return PathType::Invalid;
@@ -50,7 +50,7 @@ namespace {
             if (std::filesystem::is_directory(path)) {
                 return PathType::DirectoryTree;
             } else if (std::filesystem::is_regular_file(path)) {
-                got = PathType::File;
+                got      = PathType::File;
                 mode_str = FLAG_MODE_DIRECTORY_TREE_QUOTED;
             } else {
                 return PathType::Invalid;
@@ -77,16 +77,18 @@ namespace {
 
     ParsedArgs parseArgs(ArgArray const& args)
     {
-        Path path { args[2] };
+        Path path {args[2]};
 
-        // TODO(MATT): Test whether this is a redundant operation
+        /// TODO: (MATT) Test whether this is a redundant operation
         if (!std::filesystem::exists(path)) {
             std::cout << "The provided path is not valid." << '\n';
             std::quick_exit(1);
         }
 
-        ParsedArgs parsed_args { .path { path }, .mode {} };
-        std::string_view mode { args[1] };
+        ParsedArgs parsed_args {.path {path}, .mode {}};
+
+        /// TODO: (MATT) This if-else tree is somewhat redundant with validatePath(), so combine them
+        std::string_view mode {args[1]};
         if (mode == FLAG_MODE_FILE) {
             parsed_args.mode = validatePath(path, PathType::File);
         } else if (mode == FLAG_MODE_DIRECTORY) {
@@ -97,7 +99,7 @@ namespace {
             parsed_args.mode = PathType::Invalid;
         }
 
-        // TODO(MATT): Parse args for input and output types
+        /// TODO: (MATT)  Parse args for input and output types
 
         return parsed_args;
     }
@@ -105,7 +107,7 @@ namespace {
     void printArgs(ArgArray const& args)
     {
         std::cout << "CLI ARGS: \n";
-        size_t argc { 0 };
+        size_t argc {0};
         for (auto const& arg : args) {
             std::cout << "args[" << argc++ << "]: \" " << arg << " \"\n";
         }
@@ -136,7 +138,8 @@ namespace {
 
 ParsedArgs handleCLIArguments(ArgArray const& args)
 {
-    printArgs(args); // TODO(MATT): get rid of this eventually
+    /// TODO: (MATT)  get rid of this eventually
+    printArgs(args);
 
     switch (args.size()) {
     case 2: {

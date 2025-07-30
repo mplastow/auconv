@@ -11,9 +11,10 @@
 #include <defines.hpp>
 
 namespace auconv {
+
 // Type aliases
 using ArgArray = std::vector<std::string>;
-using Path = std::filesystem::path;
+using Path     = std::filesystem::path;
 
 // Specifies the type of path; implicitly specifies what to convert
 // TODO(MATT): May want to pry apart the type of path from the conversion mode...
@@ -26,7 +27,7 @@ enum struct PathType : int_fast8_t {
 };
 
 // Specifies an input file format
-enum struct InFormat : int_fast8_t {
+enum struct Format : int_fast8_t {
     null,
     all, // convert all decodable audio files to the output format
     wav,
@@ -35,22 +36,31 @@ enum struct InFormat : int_fast8_t {
     // ...
 };
 
-// Specifies an output file format
-enum struct OutFormat : int_fast8_t {
-    null,
-    wav,
-    flac,
-    mp3,
-    // ...
+struct InFormat {
+    Format fmt_;
+
+    InFormat() = delete;
+    explicit InFormat(Format fmt)
+        : fmt_ {fmt}
+    { }
+};
+
+struct OutFormat {
+    Format fmt_;
+
+    OutFormat() = delete;
+    explicit OutFormat(Format fmt)
+        : fmt_ {fmt}
+    { }
 };
 
 struct ParsedArgs {
-    Path path; // conversion target path
-    PathType mode = PathType::File;
-    InFormat in_format = InFormat::all;
-    OutFormat out_Format = OutFormat::flac;
+    Path      path; // conversion target path
+    PathType  mode {PathType::File};
+    InFormat  in_format {Format::all};
+    OutFormat out_Format {Format::flac};
 };
 
-} // auconv
+} // namespace auconv
 
 #endif // AUCONV_TYPES_HPP
