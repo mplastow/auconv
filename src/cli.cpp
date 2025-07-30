@@ -19,7 +19,6 @@ namespace {
     // Arg name intuition: Here's the `path` we `got`, this is the type we `want`
     PathType validatePath(const Path& path, PathType want)
     {
-        std::cout << "We gonna do validate this path.\n";
         std::string_view mode_str {};
         auto             got {PathType::Invalid};
         switch (want) {
@@ -27,7 +26,6 @@ namespace {
             /// TODO: (MATT)  How much of this code is actually redundant?
         case PathType::File: {
             if (std::filesystem::is_regular_file(path)) {
-                std::cout << "We got us a file.\n";
                 return PathType::File;
             } else if (std::filesystem::is_directory(path)) {
                 got      = PathType::Directory;
@@ -39,7 +37,6 @@ namespace {
 
         case PathType::Directory: {
             if (std::filesystem::is_directory(path)) {
-                std::cout << "We got us a dir.\n";
                 return PathType::Directory;
             } else if (std::filesystem::is_regular_file(path)) {
                 got      = PathType::File;
@@ -51,7 +48,6 @@ namespace {
 
         case PathType::DirectoryTree: {
             if (std::filesystem::is_directory(path)) {
-                std::cout << "We got us a dir tree.\n";
                 return PathType::DirectoryTree;
             } else if (std::filesystem::is_regular_file(path)) {
                 got      = PathType::File;

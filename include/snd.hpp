@@ -23,7 +23,7 @@ constexpr int FORMAT_WAV_PCM_24 {SF_FORMAT_WAV | SF_FORMAT_PCM_24};
 
 // Funcs
 
-void handleParsedArgs(ParsedArgs const& args);
+void convertFiles(ParsedArgs const& args);
 
 } // namespace auconv
 

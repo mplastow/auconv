@@ -16,7 +16,7 @@ auto main(int argc, char* argv[]) -> int
 
     auto parsed_args = auconv::handleCLIArguments(arg_vec);
 
-    auconv::handleParsedArgs(parsed_args);
+    auconv::convertFiles(parsed_args);
 
     std::quick_exit(0);
 }

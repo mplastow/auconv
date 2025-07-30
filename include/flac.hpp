@@ -8,13 +8,7 @@
 
 namespace auconv {
 
-void convertToFlacFile(const Path& input, const Path& output, int out_format);
-
-void convertWavFilesToFlac(const Path& path, PathType path_type);
-
-void convertWavToFlacInDir(const Path& path);
-
-void convertWavToFlacInDirTree(const Path& path);
+void convertDirEntryToFlac(std::filesystem::directory_entry const& dir_entry);
 
 } // namespace auconv
 

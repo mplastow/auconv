@@ -19,24 +19,6 @@ namespace auconv {
 
 namespace {
 
-    void convertDirEntryToFlac(std::filesystem::directory_entry const& dir_entry)
-    {
-        if (dir_entry.is_regular_file()) {
-            if (dir_entry.path().extension() == ".wav") {
-                std::cout << "Converting wav file: " << dir_entry.path().filename() << '\n';
-
-                std::string outputFile = dir_entry.path().parent_path();
-                outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
-
-                convertToFlacFile(dir_entry.path(), outputFile, FORMAT_FLAC_PCM_16);
-            } else {
-                std::cout << "Skipping file: " << dir_entry.path().filename() << '\n';
-            }
-        } else {
-            std::cout << "Directory: " << dir_entry << '\n';
-        }
-    }
-
     void doBufferReadWrite(SndfileHandle& in, SndfileHandle& out)
     { // Initialize conversion buffer
         std::array<short, BUFFER_SIZE> buffer {};
@@ -62,63 +44,55 @@ namespace {
         }
     }
 
+    void convertToFlacFile(const Path& input, const Path& output, int format)
+    {
+        // Get handle to input file
+        SndfileHandle in_handle {input};
+        if (in_handle.error() != 0) {
+            std::cout << "Could not open input file: " << in_handle.strError() << '\n';
+            return;
+        } else {
+            printFileInfo(input);
+        }
+
+        // Get handle to output file
+        SndfileHandle out_handle {
+            output,
+            SFM_WRITE,
+            format,
+            in_handle.channels(),
+            in_handle.samplerate()};
+
+        // Bail out if an error occurred
+        if (out_handle.error() != 0) {
+            printErrorOutputFile(in_handle, out_handle, format);
+            return;
+        }
+
+        printFileInfo(out_handle, output);
+
+        doBufferReadWrite(in_handle, out_handle);
+
+        std::cout << "\tFinished file conversion." << '\n';
+    }
+
 } // namespace
 
-void convertToFlacFile(const Path& input, const Path& output, int format)
+void convertDirEntryToFlac(std::filesystem::directory_entry const& dir_entry)
 {
-    // Get handle to input file
-    SndfileHandle in_handle {input};
-    if (in_handle.error() != 0) {
-        std::cout << "Could not open input file: " << in_handle.strError() << '\n';
-        return;
+    if (dir_entry.is_regular_file()) {
+        if (dir_entry.path().extension() == ".wav") {
+            std::cout << "Converting wav file: " << dir_entry.path().filename() << '\n';
+
+            std::string outputFile = dir_entry.path().parent_path();
+            outputFile.append("/").append(dir_entry.path().stem()).append(".flac");
+
+            convertToFlacFile(dir_entry.path(), outputFile, FORMAT_FLAC_PCM_16);
+        } else {
+            std::cout << "Skipping file: " << dir_entry.path().filename() << '\n';
+        }
     } else {
-        printFileInfo(input);
-    }
-
-    // Get handle to output file
-    SndfileHandle out_handle {
-        output,
-        SFM_WRITE,
-        format,
-        in_handle.channels(),
-        in_handle.samplerate()};
-
-    // Bail out if an error occurred
-    if (out_handle.error() != 0) {
-        printErrorOutputFile(in_handle, out_handle, format);
-        return;
-    }
-
-    printFileInfo(out_handle, output);
-
-    doBufferReadWrite(in_handle, out_handle);
-
-    std::cout << "\tFinished file conversion." << '\n';
-}
-
-/// TODO: (MATT)  These two functions are good candidates for a very basic Strategy pattern
-void convertWavFilesToFlac(const Path& path, PathType path_type)
-{
-    using namespace std::filesystem;
-
-    switch (path_type) {
-    case PathType::Directory: {
-        for (directory_entry const& dir_entry : directory_iterator(path)) {
-            convertDirEntryToFlac(dir_entry);
-        }
-    } break;
-    case PathType::DirectoryTree: {
-        for (directory_entry const& dir_entry : recursive_directory_iterator(path)) {
-            convertDirEntryToFlac(dir_entry);
-        }
-    } break;
-    case PathType::File: {
-        convertDirEntryToFlac(directory_entry(path));
-    } break;
-    default: {
-        std::cout << "Bad file got here somehow\n";
-        std::quick_exit(1);
-    } break;
+        std::cout << "Directory: " << dir_entry << '\n';
     }
 }
 

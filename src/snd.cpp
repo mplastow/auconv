@@ -14,60 +14,47 @@ namespace auconv {
 
 namespace {
 
-    /// TODO: (MATT)  multiformat
-    void convertFile(const Path& path)
+    void doConvertFile(
+        const std::filesystem::directory_entry& dir_entry,
+        // InFormat                                in_fmt  = InFormat {Format::wav},
+        OutFormat out_fmt = OutFormat {Format::flac})
     {
-        if (path.extension() == ".wav") {
-            std::cout << "Converting wav file: " << path.filename() << '\n';
-
-            std::string output = path.parent_path();
-            output.append("/").append(path.stem()).append(".flac");
-
-            /// TODO: (MATT)  multiformat, don't hardcode this!
-            auconv::convertToFlacFile(path, Path {output}, SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
-        } else {
-            std::cout << "Skipping due to file extension: " << path.filename() << '\n';
-        }
-    }
-
-    void convertFile(const Path& path, InFormat in_format, OutFormat out_format)
-    {
-        if (in_format.fmt_ == out_format.fmt_) {
-            std::cout << "Skipping " << path.filename() << " because input format matches output format.\n";
-        }
-
-        switch (in_format.fmt_) {
-        case (Format::wav): {
-            std::cout << "Converting wav file: " << path.filename() << '\n';
-
-            std::string output = path.parent_path();
-            output.append("/").append(path.stem()).append(".flac");
-
-            /// TODO: (MATT)  multiformat, don't hardcode this!
-            auconv::convertToFlacFile(path, Path {output}, SF_FORMAT_FLAC | SF_FORMAT_PCM_16);
+        switch (out_fmt.fmt_) {
+        case Format::flac: {
+            convertDirEntryToFlac(dir_entry);
         } break;
         default: {
-            std::cout << "Skipping due to file extension: " << path.filename() << '\n';
+            std::cout << "Skipping due to file extension: " << dir_entry.path().filename() << '\n';
+        } break;
         }
-        }
-    }
-
-    void convertFiles(const Path& path, PathType path_type)
-    {
-        convertWavFilesToFlac(path, path_type);
-    }
-
-    void convertFilesNew(const Path& path, PathType path_type)
-    {
-        convertWavFilesToFlac(path, path_type);
     }
 
 } // namespace
 
-void handleParsedArgs(ParsedArgs const& args)
+void convertFiles(ParsedArgs const& args)
 {
-    /// TODO: (MATT) multiformat
-    convertFiles(args.path, args.mode);
+
+    using namespace std::filesystem;
+
+    switch (args.mode) {
+    case PathType::Directory: {
+        for (directory_entry const& dir_entry : directory_iterator(args.path)) {
+            doConvertFile(dir_entry);
+        }
+    } break;
+    case PathType::DirectoryTree: {
+        for (directory_entry const& dir_entry : recursive_directory_iterator(args.path)) {
+            doConvertFile(dir_entry);
+        }
+    } break;
+    case PathType::File: {
+        doConvertFile(directory_entry(args.path));
+    } break;
+    default: {
+        std::cout << "Cannot convert a file that doesn't exist!\n";
+        std::quick_exit(1);
+    } break;
+    }
 }
 
 } // namespace auconv
