@@ -59,7 +59,6 @@ pub fn build(b: *std.Build) void {
 
         "src/cli.cpp",
         "src/files.cpp",
-        "src/flac.cpp",
         "src/mp3.cpp",
         "src/snd.cpp",
     };

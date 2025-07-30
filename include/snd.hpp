@@ -16,7 +16,7 @@ namespace auconv {
 constexpr int FORMAT_FLAC_PCM_16 {SF_FORMAT_FLAC | SF_FORMAT_PCM_16};
 
 /// TODO: Does this work?
-constexpr int FORMAT_MP3 {SF_FORMAT_MPEG_LAYER_III};
+constexpr int FORMAT_MP3 {SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III};
 
 constexpr int FORMAT_WAV_PCM_16 {SF_FORMAT_WAV | SF_FORMAT_PCM_16};
 constexpr int FORMAT_WAV_PCM_24 {SF_FORMAT_WAV | SF_FORMAT_PCM_24};
