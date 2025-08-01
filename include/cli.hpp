@@ -18,7 +18,7 @@ constexpr std::string FLAG_MODE_FILE_QUOTED           = "'-f'";
 constexpr std::string FLAG_MODE_DIRECTORY_TREE_QUOTED = "'-t'";
 constexpr std::string FLAG_MODE_DIRECTORY_QUOTED      = "'-d'";
 
-ParsedArgs handleCLIArguments(ArgArray const& args);
+CLIArgs handleCLIArguments(ArgArray const& args);
 
 } // namespace auconv
 

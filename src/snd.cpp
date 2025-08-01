@@ -109,18 +109,18 @@ namespace {
     void sendConversionTask(
         const std::filesystem::directory_entry& dir_entry,
         // InFormat                                in_fmt  = InFormat {Format::wav},
-        OutFormat out_fmt = OutFormat {Format::wav})
+        OutFormat out_fmt = OutFormat {FormatTag::wav})
     {
         switch (out_fmt.fmt_) {
-        case Format::flac: {
+        case FormatTag::flac: {
             processDirEntry(dir_entry, FORMAT_FLAC_PCM_16, ".flac");
         } break;
-        case Format::mp3: {
+        case FormatTag::mp3: {
             // processDirEntry(dir_entry, FORMAT_MP3, ".mp3");
             std::cout << "MP3 output not yet supported.\n";
             std::quick_exit(1);
         } break;
-        case Format::wav: {
+        case FormatTag::wav: {
             processDirEntry(dir_entry, FORMAT_WAV_PCM_16, ".wav");
         } break;
         default: {
@@ -131,7 +131,7 @@ namespace {
 
 } // namespace
 
-void convertFiles(ParsedArgs const& args)
+void convertFiles(CLIArgs const& args)
 {
     using namespace std::filesystem;
 

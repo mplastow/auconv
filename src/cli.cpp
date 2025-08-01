@@ -90,7 +90,7 @@ namespace {
         return path_type;
     }
 
-    ParsedArgs parseArgs(ArgArray const& args)
+    CLIArgs parseArgs(ArgArray const& args)
     {
         Path path {args[2]};
 
@@ -100,7 +100,7 @@ namespace {
             std::quick_exit(1);
         }
 
-        ParsedArgs parsed_args {.path {path}, .mode {}};
+        CLIArgs parsed_args {.path {path}, .mode {}};
 
         std::string_view mode {args[1]};
         parsed_args.mode = parseMode(path, mode);
@@ -142,7 +142,7 @@ namespace {
 
 } // namespace
 
-ParsedArgs handleCLIArguments(ArgArray const& args)
+CLIArgs handleCLIArguments(ArgArray const& args)
 {
     /// TODO: (MATT)  get rid of this eventually
     printArgs(args);

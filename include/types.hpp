@@ -27,7 +27,7 @@ enum struct PathType : int_fast8_t {
 };
 
 // Specifies an input file format
-enum struct Format : int_fast8_t {
+enum struct FormatTag : int_fast8_t {
     null,
     all, // convert all decodable audio files to the output format
     wav,
@@ -37,28 +37,30 @@ enum struct Format : int_fast8_t {
 };
 
 struct InFormat {
-    Format fmt_;
+    FormatTag fmt_;
 
-    InFormat() = delete;
-    explicit InFormat(Format fmt)
+    InFormat()
+        : fmt_ {FormatTag::null} { };
+    explicit InFormat(FormatTag fmt)
         : fmt_ {fmt}
     { }
 };
 
 struct OutFormat {
-    Format fmt_;
+    FormatTag fmt_;
 
-    OutFormat() = delete;
-    explicit OutFormat(Format fmt)
+    OutFormat()
+        : fmt_ {FormatTag::null} { };
+    explicit OutFormat(FormatTag fmt)
         : fmt_ {fmt}
     { }
 };
 
-struct ParsedArgs {
+struct CLIArgs {
     Path      path; // conversion target path
     PathType  mode {PathType::File};
-    InFormat  in_format {Format::all};
-    OutFormat out_Format {Format::flac};
+    InFormat  in_format {FormatTag::all};
+    OutFormat out_Format {FormatTag::flac};
 };
 
 } // namespace auconv

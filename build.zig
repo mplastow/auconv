@@ -17,31 +17,6 @@ pub fn build(b: *std.Build) void {
     var targets = std.ArrayList(*std.Build.Step.Compile).init(b.allocator);
 
     ////////////////////////////////////////////////////////////////////////////
-    // Build and install a C++ library
-    //
-    // TODO(MATT): use this template to build libsndfile, libmp3lame, ...
-    const lib = b.addStaticLibrary(.{
-        .name = "factorial",
-        .target = target,
-        .optimize = .Debug,
-    });
-
-    lib.addCSourceFiles(.{
-        .files = &.{
-            "lib/lib.cpp",
-        },
-        .flags = &.{
-            "-std=c++23",
-            "-O0",
-            // NOTE(matt): Use more flags for building real libraries
-        },
-    });
-    lib.addIncludePath(b.path("include/"));
-    lib.linkLibCpp();
-
-    b.installArtifact(lib);
-
-    ////////////////////////////////////////////////////////////////////////////
     // Build executable
     //
     const exe = b.addExecutable(.{
@@ -145,7 +120,6 @@ pub fn build(b: *std.Build) void {
 
     // Add include paths (one path per folder containing a #include)
     exe.addIncludePath(b.path("include/"));
-    exe.addIncludePath(b.path("lib/include/"));
     exe.addIncludePath(b.path("external/"));
 
     // Link libraries
@@ -153,7 +127,6 @@ pub fn build(b: *std.Build) void {
     exe.linkLibCpp();
     exe.linkSystemLibrary("mp3lame"); // TODO(MATT): replace with a built-from-source library
     exe.linkSystemLibrary("sndfile"); // TODO(MATT): replace with a built-from-source library
-    // e.g. exe.linkSystemLibrary("SDL3"); // when appropriate
 
     // Add .c and .cpp files along with specified compiler flags
     exe.addCSourceFiles(.{

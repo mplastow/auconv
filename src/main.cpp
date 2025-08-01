@@ -2,8 +2,9 @@
 
 #include <cstdio>
 
-#include <defines.hpp>
 #include <cli.hpp>
+#include <defines.hpp>
+#include <format.hpp>
 #include <snd.hpp>
 #include <types.hpp>
 
@@ -13,6 +14,8 @@ auto main(int argc, char* argv[]) -> int
     for (int i {0}; i < argc; ++i) {
         arg_vec.emplace_back(argv[i]);
     }
+
+    auconv::Format<auconv::Flac> flac {6};
 
     auto parsed_args = auconv::handleCLIArguments(arg_vec);
 

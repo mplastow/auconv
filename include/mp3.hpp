@@ -12,7 +12,7 @@ namespace auconv {
 
 lame_global_flags* initLameWithFlags();
 
-void convertWavToMp3(Path const& inputFile, Path const& outputFile);
+void convertWavToMp3(Path const& input, Path const& output);
 
 } // namespace auconv
 
