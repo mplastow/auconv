@@ -40,7 +40,8 @@ struct InFormat {
     FormatTag fmt_;
 
     InFormat()
-        : fmt_ {FormatTag::null} { };
+        : fmt_ {FormatTag::null}
+    { }
     explicit InFormat(FormatTag fmt)
         : fmt_ {fmt}
     { }
@@ -50,7 +51,8 @@ struct OutFormat {
     FormatTag fmt_;
 
     OutFormat()
-        : fmt_ {FormatTag::null} { };
+        : fmt_ {FormatTag::null}
+    { }
     explicit OutFormat(FormatTag fmt)
         : fmt_ {fmt}
     { }

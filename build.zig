@@ -43,7 +43,7 @@ pub fn build(b: *std.Build) void {
         "-std=c++23", // C++ 23
         "-g", // Include debug information in binary
         "-ggdb3", // Maximizes debug information
-        "-Og", // Optimization level: Og = debug, Os = size, O2 = good, O3 = maximum
+        "-O3", // Optimization level: Og = debug, Os = size, O2 = good, O3 = maximum
 
         // // Warning flags
         "-Wall", // Reasonable default warnings

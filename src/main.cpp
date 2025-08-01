@@ -15,7 +15,10 @@ auto main(int argc, char* argv[]) -> int
         arg_vec.emplace_back(argv[i]);
     }
 
-    auconv::Format<auconv::Flac> flac {6};
+    auconv::Format wav {1};
+    auconv::Format flac {2};
+
+    auconv::convert(wav, flac);
 
     auto parsed_args = auconv::handleCLIArguments(arg_vec);
 

@@ -2,9 +2,9 @@
 	{
 		"arguments": [
 			"clang",
-			"/home/matt/auconv/src/main.cpp",
+			"/home/kobaybeefu/auconv/src/main.cpp",
 			"-o",
-			"/home/matt/.cache/zig/main.cpp.o",
+			"/home/kobaybeefu/.cache/zig/main.cpp.o",
 			"-std=c++23",
 			"-g",
 			"-ggdb3",
@@ -49,19 +49,19 @@
 			"-fstrict-vtable-pointers",
 			"-lmp3lame",
 			"-lsndfile",
-			"-I/home/matt/auconv/include",
-			"-I/home/matt/auconv/external"
+			"-I/home/kobaybeefu/auconv/include",
+			"-I/home/kobaybeefu/auconv/external"
 		],
-		"directory": "/home/matt/auconv",
-		"file": "/home/matt/auconv/src/main.cpp",
-		"output": "/home/matt/.cache/zig/main.cpp.o"
+		"directory": "/home/kobaybeefu/auconv",
+		"file": "/home/kobaybeefu/auconv/src/main.cpp",
+		"output": "/home/kobaybeefu/.cache/zig/main.cpp.o"
 	},
 	{
 		"arguments": [
 			"clang",
-			"/home/matt/auconv/src/cli.cpp",
+			"/home/kobaybeefu/auconv/src/cli.cpp",
 			"-o",
-			"/home/matt/.cache/zig/cli.cpp.o",
+			"/home/kobaybeefu/.cache/zig/cli.cpp.o",
 			"-std=c++23",
 			"-g",
 			"-ggdb3",
@@ -106,19 +106,19 @@
 			"-fstrict-vtable-pointers",
 			"-lmp3lame",
 			"-lsndfile",
-			"-I/home/matt/auconv/include",
-			"-I/home/matt/auconv/external"
+			"-I/home/kobaybeefu/auconv/include",
+			"-I/home/kobaybeefu/auconv/external"
 		],
-		"directory": "/home/matt/auconv",
-		"file": "/home/matt/auconv/src/cli.cpp",
-		"output": "/home/matt/.cache/zig/cli.cpp.o"
+		"directory": "/home/kobaybeefu/auconv",
+		"file": "/home/kobaybeefu/auconv/src/cli.cpp",
+		"output": "/home/kobaybeefu/.cache/zig/cli.cpp.o"
 	},
 	{
 		"arguments": [
 			"clang",
-			"/home/matt/auconv/src/files.cpp",
+			"/home/kobaybeefu/auconv/src/files.cpp",
 			"-o",
-			"/home/matt/.cache/zig/files.cpp.o",
+			"/home/kobaybeefu/.cache/zig/files.cpp.o",
 			"-std=c++23",
 			"-g",
 			"-ggdb3",
@@ -163,19 +163,19 @@
 			"-fstrict-vtable-pointers",
 			"-lmp3lame",
 			"-lsndfile",
-			"-I/home/matt/auconv/include",
-			"-I/home/matt/auconv/external"
+			"-I/home/kobaybeefu/auconv/include",
+			"-I/home/kobaybeefu/auconv/external"
 		],
-		"directory": "/home/matt/auconv",
-		"file": "/home/matt/auconv/src/files.cpp",
-		"output": "/home/matt/.cache/zig/files.cpp.o"
+		"directory": "/home/kobaybeefu/auconv",
+		"file": "/home/kobaybeefu/auconv/src/files.cpp",
+		"output": "/home/kobaybeefu/.cache/zig/files.cpp.o"
 	},
 	{
 		"arguments": [
 			"clang",
-			"/home/matt/auconv/src/mp3.cpp",
+			"/home/kobaybeefu/auconv/src/mp3.cpp",
 			"-o",
-			"/home/matt/.cache/zig/mp3.cpp.o",
+			"/home/kobaybeefu/.cache/zig/mp3.cpp.o",
 			"-std=c++23",
 			"-g",
 			"-ggdb3",
@@ -220,19 +220,19 @@
 			"-fstrict-vtable-pointers",
 			"-lmp3lame",
 			"-lsndfile",
-			"-I/home/matt/auconv/include",
-			"-I/home/matt/auconv/external"
+			"-I/home/kobaybeefu/auconv/include",
+			"-I/home/kobaybeefu/auconv/external"
 		],
-		"directory": "/home/matt/auconv",
-		"file": "/home/matt/auconv/src/mp3.cpp",
-		"output": "/home/matt/.cache/zig/mp3.cpp.o"
+		"directory": "/home/kobaybeefu/auconv",
+		"file": "/home/kobaybeefu/auconv/src/mp3.cpp",
+		"output": "/home/kobaybeefu/.cache/zig/mp3.cpp.o"
 	},
 	{
 		"arguments": [
 			"clang",
-			"/home/matt/auconv/src/snd.cpp",
+			"/home/kobaybeefu/auconv/src/snd.cpp",
 			"-o",
-			"/home/matt/.cache/zig/snd.cpp.o",
+			"/home/kobaybeefu/.cache/zig/snd.cpp.o",
 			"-std=c++23",
 			"-g",
 			"-ggdb3",
@@ -277,11 +277,11 @@
 			"-fstrict-vtable-pointers",
 			"-lmp3lame",
 			"-lsndfile",
-			"-I/home/matt/auconv/include",
-			"-I/home/matt/auconv/external"
+			"-I/home/kobaybeefu/auconv/include",
+			"-I/home/kobaybeefu/auconv/external"
 		],
-		"directory": "/home/matt/auconv",
-		"file": "/home/matt/auconv/src/snd.cpp",
-		"output": "/home/matt/.cache/zig/snd.cpp.o"
+		"directory": "/home/kobaybeefu/auconv",
+		"file": "/home/kobaybeefu/auconv/src/snd.cpp",
+		"output": "/home/kobaybeefu/.cache/zig/snd.cpp.o"
 	}
 ]
