@@ -26,3 +26,13 @@ zig-out/
 # Although this was renamed to .zig-cache, let's leave it here for a few
 # releases to make it less annoying to work with multiple branches.
 zig-cache/
+
+/assets/
+/data/
+/extern/
+/external/
+/third-party/
+/thirdparty/
+/vendor/
+
+/compile_commands.json
